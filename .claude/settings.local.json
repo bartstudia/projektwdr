@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(test:*)",
+      "Bash(npx create-react-app@latest client)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
