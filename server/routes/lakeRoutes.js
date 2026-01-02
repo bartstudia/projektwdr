@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const lakeController = require('../controllers/lakeController');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
 const upload = require('../middleware/upload');
 

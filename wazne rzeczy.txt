@@ -12,5 +12,6 @@ komendy na odpalenie
 backedn
 C:\Users\rokib\OneDrive\Desktop\projektwdr\server>npm run dev
 
+
 fornend
 C:\Users\rokib\OneDrive\Desktop\projektwdr\client> npm start

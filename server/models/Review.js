@@ -49,7 +49,7 @@ ReviewSchema.pre('save', function(next) {
 ReviewSchema.statics.calculateAverageRating = async function(lakeId) {
   const result = await this.aggregate([
     {
-      $match: { lakeId: mongoose.Types.ObjectId(lakeId) }
+      $match: { lakeId: new mongoose.Types.ObjectId(lakeId) }
     },
     {
       $group: {

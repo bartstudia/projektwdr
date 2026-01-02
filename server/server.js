@@ -37,8 +37,8 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/lakes', require('./routes/lakeRoutes'));
 app.use('/api/spots', require('./routes/spotRoutes'));
-// app.use('/api/reservations', require('./routes/reservationRoutes'));
-// app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/reservations', require('./routes/reservationRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
 // Obsługa błędów 404
 app.use((req, res) => {

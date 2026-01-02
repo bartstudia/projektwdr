@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const spotController = require('../controllers/spotController');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
 
 // Public routes

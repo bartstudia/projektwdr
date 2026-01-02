@@ -54,4 +54,18 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+// Middleware do sprawdzania czy użytkownik jest adminem
+const adminOnly = (req, res, next) => {
+  if (req.userRole !== 'admin') {
+    return res.status(403).json({
+      message: 'Dostęp tylko dla administratorów'
+    });
+  }
+  next();
+};
+
+module.exports = {
+  auth,
+  protect: auth, // alias dla zgodności
+  adminOnly
+};

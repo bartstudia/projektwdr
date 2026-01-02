@@ -1,0 +1,5 @@
+dokonać zmian z mapą stanowisk żeby ułatwić ich oznaczanie, znaleźć jakies mapy jezior i dodac na stronne, dodać gps z np. map google na łowiska.
+poprawić cały css stronki
+(Przyszłościowo wjebać to na server AWS)
+Pomyśleć nad innymi usprawnieniami
+Dodać logo na stronę już gotowe

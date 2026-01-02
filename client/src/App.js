@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
+import Footer from './components/common/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Pages
@@ -11,6 +12,15 @@ import RegisterPage from './pages/RegisterPage';
 import UserDashboard from './pages/user/UserDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageLakes from './pages/admin/ManageLakes';
+import ManageSpots from './pages/admin/ManageSpots';
+import AdminReservations from './pages/admin/AdminReservations';
+import AdminReviews from './pages/admin/AdminReviews';
+import AdminSpots from './pages/admin/AdminSpots';
+import LakesPage from './pages/user/LakesPage';
+import LakeDetailPage from './pages/user/LakeDetailPage';
+import ReservationPage from './pages/user/ReservationPage';
+import MyReservations from './pages/user/MyReservations';
+import MyReviews from './pages/user/MyReviews';
 
 import './App.css';
 
@@ -47,15 +57,21 @@ function App() {
                 }
               />
 
-              {/* Placeholder routes - będą dodane później */}
+              {/* User routes - Lakes */}
               <Route
                 path="/lakes"
                 element={
                   <ProtectedRoute>
-                    <div className="page-container">
-                      <h1>Jeziora - W budowie</h1>
-                      <p>Ta strona będzie wkrótce dostępna</p>
-                    </div>
+                    <LakesPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/lakes/:id"
+                element={
+                  <ProtectedRoute>
+                    <LakeDetailPage />
                   </ProtectedRoute>
                 }
               />
@@ -64,10 +80,25 @@ function App() {
                 path="/my-reservations"
                 element={
                   <ProtectedRoute>
-                    <div className="page-container">
-                      <h1>Moje Rezerwacje - W budowie</h1>
-                      <p>Ta strona będzie wkrótce dostępna</p>
-                    </div>
+                    <MyReservations />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/reservation/:lakeId/:spotId"
+                element={
+                  <ProtectedRoute>
+                    <ReservationPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/my-reviews"
+                element={
+                  <ProtectedRoute>
+                    <MyReviews />
                   </ProtectedRoute>
                 }
               />
@@ -77,6 +108,42 @@ function App() {
                 element={
                   <ProtectedRoute adminOnly>
                     <ManageLakes />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/lakes/:lakeId/spots"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <ManageSpots />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/reservations"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <AdminReservations />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/reviews"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <AdminReviews />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/admin/spots"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <AdminSpots />
                   </ProtectedRoute>
                 }
               />
@@ -93,6 +160,7 @@ function App() {
               />
             </Routes>
           </main>
+          <Footer />
         </div>
       </AuthProvider>
     </Router>
