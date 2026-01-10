@@ -55,7 +55,7 @@ exports.getSpotById = async (req, res) => {
 // @access  Private (Admin)
 exports.createSpot = async (req, res) => {
   try {
-    const { lakeId, name, description, mapCoordinates } = req.body;
+    const { lakeId, name, description, mapCoordinates, gpsLink, latitude, longitude } = req.body;
 
     // Walidacja
     if (!lakeId || !name || !mapCoordinates) {
@@ -84,7 +84,10 @@ exports.createSpot = async (req, res) => {
       lakeId,
       name,
       description,
-      mapCoordinates
+      mapCoordinates,
+      gpsLink: gpsLink || null,
+      latitude: latitude !== undefined ? latitude : null,
+      longitude: longitude !== undefined ? longitude : null
     });
 
     res.status(201).json({
@@ -114,7 +117,7 @@ exports.createSpot = async (req, res) => {
 // @access  Private (Admin)
 exports.updateSpot = async (req, res) => {
   try {
-    const { name, description, mapCoordinates, isActive } = req.body;
+    const { name, description, mapCoordinates, isActive, gpsLink, latitude, longitude } = req.body;
 
     const spot = await FishingSpot.findById(req.params.id);
 
@@ -129,6 +132,9 @@ exports.updateSpot = async (req, res) => {
     if (description !== undefined) spot.description = description;
     if (mapCoordinates) spot.mapCoordinates = mapCoordinates;
     if (isActive !== undefined) spot.isActive = isActive;
+    if (gpsLink !== undefined) spot.gpsLink = gpsLink || null;
+    if (latitude !== undefined) spot.latitude = latitude;
+    if (longitude !== undefined) spot.longitude = longitude;
 
     await spot.save();
 

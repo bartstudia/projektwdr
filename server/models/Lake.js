@@ -30,6 +30,18 @@ const LakeSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  gpsLink: {
+    type: String,
+    default: null
+  },
+  latitude: {
+    type: Number,
+    default: null
+  },
+  longitude: {
+    type: Number,
+    default: null
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

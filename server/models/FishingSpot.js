@@ -16,6 +16,18 @@ const FishingSpotSchema = new mongoose.Schema({
     type: String,
     maxlength: [500, 'Opis może mieć maksymalnie 500 znaków']
   },
+  gpsLink: {
+    type: String,
+    default: null
+  },
+  latitude: {
+    type: Number,
+    default: null
+  },
+  longitude: {
+    type: Number,
+    default: null
+  },
   // Współrzędne dla clickable area na mapie obrazkowej
   mapCoordinates: {
     shape: {
@@ -66,3 +78,4 @@ FishingSpotSchema.pre('save', function(next) {
 });
 
 module.exports = mongoose.model('FishingSpot', FishingSpotSchema);
+
