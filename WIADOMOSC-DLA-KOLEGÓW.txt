@@ -1,0 +1,25 @@
+Hej!
+
+Wrzuciłem nasz projekt na GitHub. Oto jak go uruchomić:
+
+📥 LINK DO PROJEKTU:
+https://github.com/TWOJ_USERNAME/projektwdr
+
+📖 INSTRUKCJA:
+1. Pobierz projekt (git clone lub Download ZIP)
+2. Otwórz plik: DLA-KOLEGÓW.md
+3. Postępuj krok po kroku
+
+🔑 CONNECTION STRING (NIE UDOSTĘPNIAJ NIKOMU!):
+mongodb+srv://fishing_user:TWOJE_HASLO@cluster0.xxxxx.mongodb.net/fishing-reservation
+
+⚠️ WAŻNE:
+- W kroku 3 (Konfiguracja) wklej ten connection string do server/.env
+- Każdy uruchamia backend i frontend na swoim komputerze
+- Wszyscy będziemy widzieć te same dane (ta sama baza)
+
+📞 JEŚLI COŚ NIE DZIAŁA:
+- Przeczytaj plik DLA-KOLEGÓW.md - jest sekcja "Problemy"
+- Napisz do mnie
+
+Powodzenia! 🚀
