@@ -14,7 +14,10 @@ const ManageSpots = () => {
   const [showEditor, setShowEditor] = useState(false);
   const [newSpot, setNewSpot] = useState({
     name: '',
-    description: ''
+    description: '',
+    gpsLink: '',
+    latitude: '',
+    longitude: ''
   });
 
   useEffect(() => {
@@ -47,10 +50,19 @@ const ManageSpots = () => {
         lakeId,
         name: newSpot.name,
         description: newSpot.description,
-        mapCoordinates
+        mapCoordinates,
+        gpsLink: newSpot.gpsLink.trim() || null,
+        latitude: newSpot.latitude !== '' ? Number(newSpot.latitude) : null,
+        longitude: newSpot.longitude !== '' ? Number(newSpot.longitude) : null
       });
 
-      setNewSpot({ name: '', description: '' });
+      setNewSpot({
+        name: '',
+        description: '',
+        gpsLink: '',
+        latitude: '',
+        longitude: ''
+      });
       setShowEditor(false);
       fetchData();
     } catch (err) {
@@ -145,6 +157,37 @@ const ManageSpots = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="spotGpsLink">Link do mapy (opcjonalnie):</label>
+            <input
+              type="url"
+              id="spotGpsLink"
+              value={newSpot.gpsLink}
+              onChange={(e) => setNewSpot({ ...newSpot, gpsLink: e.target.value })}
+              placeholder="https://www.google.com/maps?q=..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Współrzędne GPS (opcjonalnie):</label>
+            <div className="gps-inputs">
+              <input
+                type="number"
+                value={newSpot.latitude}
+                onChange={(e) => setNewSpot({ ...newSpot, latitude: e.target.value })}
+                placeholder="Latitude"
+                step="0.000001"
+              />
+              <input
+                type="number"
+                value={newSpot.longitude}
+                onChange={(e) => setNewSpot({ ...newSpot, longitude: e.target.value })}
+                placeholder="Longitude"
+                step="0.000001"
+              />
+            </div>
+          </div>
+
           <p className="editor-info">
             Teraz kliknij na obrazie jeziora, aby zaznaczyć lokalizację stanowiska:
           </p>
@@ -159,7 +202,13 @@ const ManageSpots = () => {
           <button
             onClick={() => {
               setShowEditor(false);
-              setNewSpot({ name: '', description: '' });
+              setNewSpot({
+                name: '',
+                description: '',
+                gpsLink: '',
+                latitude: '',
+                longitude: ''
+              });
             }}
             className="btn-secondary"
           >

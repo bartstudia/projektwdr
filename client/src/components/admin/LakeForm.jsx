@@ -5,7 +5,10 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    location: ''
+    location: '',
+    gpsLink: '',
+    latitude: '',
+    longitude: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -17,7 +20,10 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
       setFormData({
         name: lake.name || '',
         description: lake.description || '',
-        location: lake.location || ''
+        location: lake.location || '',
+        gpsLink: lake.gpsLink || '',
+        latitude: lake.latitude ?? '',
+        longitude: lake.longitude ?? ''
       });
       if (lake.imageUrl) {
         setImagePreview(`http://localhost:5000${lake.imageUrl}`);
@@ -55,13 +61,20 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
     try {
       let savedLake;
 
+      const payload = {
+        ...formData,
+        gpsLink: formData.gpsLink.trim() || null,
+        latitude: formData.latitude !== '' ? Number(formData.latitude) : null,
+        longitude: formData.longitude !== '' ? Number(formData.longitude) : null
+      };
+
       if (lake) {
-        // Aktualizuj istniejÄ…ce jezioro
-        const result = await lakeService.updateLake(lake._id, formData);
+        // Aktualizuj istniejŽ£…ce jezioro
+        const result = await lakeService.updateLake(lake._id, payload);
         savedLake = result.lake;
       } else {
-        // UtwÃ³rz nowe jezioro
-        const result = await lakeService.createLake(formData);
+        // UtwŽ£…rz nowe jezioro
+        const result = await lakeService.createLake(payload);
         savedLake = result.lake;
       }
 
@@ -71,7 +84,14 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
       }
 
       // Reset formularza
-      setFormData({ name: '', description: '', location: '' });
+      setFormData({
+        name: '',
+        description: '',
+        location: '',
+        gpsLink: '',
+        latitude: '',
+        longitude: ''
+      });
       setImageFile(null);
       setImagePreview(null);
 
@@ -134,6 +154,39 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
         </div>
 
         <div className="form-group">
+          <label htmlFor="gpsLink">Link do mapy (opcjonalnie):</label>
+          <input
+            type="url"
+            id="gpsLink"
+            name="gpsLink"
+            value={formData.gpsLink}
+            onChange={handleChange}
+            placeholder="https://www.google.com/maps?q=..."
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Wspó³rzêdne GPS (opcjonalnie):</label>
+          <div className="gps-inputs">
+            <input
+              type="number"
+              name="latitude"
+              value={formData.latitude}
+              onChange={handleChange}
+              placeholder="Latitude"
+              step="0.000001"
+            />
+            <input
+              type="number"
+              name="longitude"
+              value={formData.longitude}
+              onChange={handleChange}
+              placeholder="Longitude"
+              step="0.000001"
+            />
+          </div>
+        </div>
+        <div className="form-group">
           <label htmlFor="image">Obraz jeziora (mapa):</label>
           <input
             type="file"
@@ -165,3 +218,7 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
 };
 
 export default LakeForm;
+
+
+
+
