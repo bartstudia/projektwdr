@@ -32,7 +32,7 @@ lerna-debug.log*
 *~
 
 # Uploads
-server/uploads/
+# server/uploads/  ← Tymczasowo wyłączone dla testów
 
 # OS
 Thumbs.db
