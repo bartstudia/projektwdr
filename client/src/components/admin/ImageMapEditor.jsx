@@ -4,6 +4,7 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
   const [clickedPoints, setClickedPoints] = useState([]);
   const [shape, setShape] = useState('circle');
   const [previewCoords, setPreviewCoords] = useState(null);
+  const [hoverPoint, setHoverPoint] = useState(null);
   const imageRef = useRef(null);
 
   const handleImageClick = (e) => {
@@ -16,6 +17,7 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
     const newPoint = { x, y };
     const updatedPoints = [...clickedPoints, newPoint];
     setClickedPoints(updatedPoints);
+    setHoverPoint(null);
 
     // Auto-complete based on shape
     if (shape === 'circle' && updatedPoints.length === 2) {
@@ -48,6 +50,8 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
       setPreviewCoords({ shape: 'circle', x: clickedPoints[0].x, y: clickedPoints[0].y, radius });
     } else if (shape === 'rect' && clickedPoints.length === 1) {
       setPreviewCoords({ shape: 'rect', x1: clickedPoints[0].x, y1: clickedPoints[0].y, x2: x, y2: y });
+    } else if (shape === 'poly') {
+      setHoverPoint({ x, y });
     }
   };
 
@@ -59,6 +63,12 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
   const handleReset = () => {
     setClickedPoints([]);
     setPreviewCoords(null);
+    setHoverPoint(null);
+  };
+
+  const handleUndoLastPoint = () => {
+    if (clickedPoints.length === 0) return;
+    setClickedPoints((prev) => prev.slice(0, -1));
   };
 
   const handlePolygonComplete = () => {
@@ -93,6 +103,11 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
             {shape === 'poly' && clickedPoints.length >= 3 && (
               <button type="button" onClick={handlePolygonComplete} className="btn-primary btn-small">
                 Zakończ wielokąt
+              </button>
+            )}
+            {shape === 'poly' && (
+              <button type="button" onClick={handleUndoLastPoint} className="btn-secondary btn-small">
+                Cofnij punkt
               </button>
             )}
             <button type="button" onClick={handleReset} className="btn-secondary btn-small">
@@ -209,6 +224,17 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
                 />
               );
             })}
+            {hoverPoint && clickedPoints.length > 0 && (
+              <line
+                x1={clickedPoints[clickedPoints.length - 1].x}
+                y1={clickedPoints[clickedPoints.length - 1].y}
+                x2={hoverPoint.x}
+                y2={hoverPoint.y}
+                stroke="#90caf9"
+                strokeWidth="2"
+                strokeDasharray="4 6"
+              />
+            )}
           </svg>
         )}
 

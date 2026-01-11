@@ -143,6 +143,22 @@ const LakeDetailPage = () => {
     return spots.filter(spot => !reservedSpotIds.includes(spot._id)).length;
   };
 
+  const handleReserveFirstAvailable = () => {
+    if (!selectedDate) {
+      alert('Proszę wybrać datę rezerwacji');
+      return;
+    }
+
+    const firstAvailable = spots.find((spot) => !reservedSpotIds.includes(spot._id));
+    if (!firstAvailable) {
+      alert('Brak dostępnych stanowisk w wybranym terminie');
+      return;
+    }
+
+    setSelectedSpot(firstAvailable);
+    navigate(`/reservation/${lake._id}/${firstAvailable._id}?date=${selectedDate}`);
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -229,6 +245,17 @@ const LakeDetailPage = () => {
                 <span className="stat-label">Zarezerwowane:</span>
                 <span className="stat-value reserved">{reservedSpotIds.length}</span>
               </div>
+            </div>
+          )}
+          {selectedDate && spots.length > 0 && (
+            <div className="availability-actions">
+              <button
+                onClick={handleReserveFirstAvailable}
+                className="btn-primary btn-small"
+                disabled={getAvailableSpotsCount() === 0}
+              >
+                Zarezerwuj pierwsze dostępne
+              </button>
             </div>
           )}
         </div>

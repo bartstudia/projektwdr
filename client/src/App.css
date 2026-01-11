@@ -814,6 +814,44 @@ body {
   margin-bottom: 2rem;
 }
 
+.availability-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.availability-filters label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.availability-filters input[type="date"] {
+  padding: 0.65rem 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.availability-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.availability-loading {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
 .search-input {
   width: 100%;
   max-width: 600px;
@@ -924,6 +962,26 @@ body {
   margin-bottom: 1.5rem;
   flex: 1;
   font-size: 0.95rem;
+}
+
+.lake-availability {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.availability-count.available {
+  color: #2e7d32;
+}
+
+.availability-count.unavailable {
+  color: #c62828;
 }
 
 .btn-card {
@@ -1201,6 +1259,12 @@ body {
   gap: 2.5rem;
   align-items: flex-start;
   flex-wrap: wrap;
+}
+
+.availability-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .date-input-group {
@@ -2474,6 +2538,29 @@ body {
   margin-bottom: 2rem;
 }
 
+.bulk-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+}
+
+.bulk-info {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .stat-card {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
@@ -2791,6 +2878,11 @@ body {
 
   .lakes-grid-user {
     grid-template-columns: 1fr;
+  }
+
+  .availability-filters {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .spots-list {
