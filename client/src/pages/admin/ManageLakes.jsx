@@ -9,10 +9,16 @@ const ManageLakes = () => {
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingLake, setEditingLake] = useState(null);
+  const [selectedLakeIds, setSelectedLakeIds] = useState([]);
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   useEffect(() => {
     fetchLakes();
   }, []);
+
+  useEffect(() => {
+    setSelectedLakeIds((prev) => prev.filter((id) => lakes.some((lake) => lake._id === id)));
+  }, [lakes]);
 
   const fetchLakes = async () => {
     try {
@@ -37,6 +43,58 @@ const ManageLakes = () => {
       fetchLakes();
     } catch (err) {
       alert(err.message || 'Błąd podczas usuwania jeziora');
+    }
+  };
+
+  const toggleLakeSelection = (lakeId) => {
+    setSelectedLakeIds((prev) => (
+      prev.includes(lakeId) ? prev.filter((id) => id !== lakeId) : [...prev, lakeId]
+    ));
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedLakeIds.length === lakes.length) {
+      setSelectedLakeIds([]);
+      return;
+    }
+    setSelectedLakeIds(lakes.map((lake) => lake._id));
+  };
+
+  const handleBulkUpdate = async (isActive) => {
+    if (selectedLakeIds.length === 0) return;
+
+    try {
+      setBulkLoading(true);
+      await Promise.all(
+        lakes
+          .filter((lake) => selectedLakeIds.includes(lake._id))
+          .filter((lake) => lake.isActive !== isActive)
+          .map((lake) => lakeService.updateLake(lake._id, { isActive }))
+      );
+      await fetchLakes();
+      setSelectedLakeIds([]);
+    } catch (err) {
+      alert(err.message || 'Błąd podczas masowej aktualizacji');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedLakeIds.length === 0) return;
+    if (!window.confirm('Czy na pewno chcesz usunąć wybrane jeziora?')) {
+      return;
+    }
+
+    try {
+      setBulkLoading(true);
+      await Promise.all(selectedLakeIds.map((lakeId) => lakeService.deleteLake(lakeId)));
+      await fetchLakes();
+      setSelectedLakeIds([]);
+    } catch (err) {
+      alert(err.message || 'Błąd podczas masowego usuwania jezior');
+    } finally {
+      setBulkLoading(false);
     }
   };
 
@@ -94,6 +152,43 @@ const ManageLakes = () => {
         </div>
       )}
 
+      {lakes.length > 0 && (
+        <div className="bulk-actions-bar">
+          <div className="bulk-info">Zaznaczono: {selectedLakeIds.length}</div>
+          <label className="bulk-select-all">
+            <input
+              type="checkbox"
+              checked={selectedLakeIds.length === lakes.length}
+              onChange={toggleSelectAll}
+            />
+            Zaznacz wszystkie
+          </label>
+          <div className="bulk-actions">
+            <button
+              onClick={() => handleBulkUpdate(true)}
+              className="btn-primary btn-small"
+              disabled={bulkLoading || selectedLakeIds.length === 0}
+            >
+              Aktywuj
+            </button>
+            <button
+              onClick={() => handleBulkUpdate(false)}
+              className="btn-secondary btn-small"
+              disabled={bulkLoading || selectedLakeIds.length === 0}
+            >
+              Dezaktywuj
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              className="btn-danger btn-small"
+              disabled={bulkLoading || selectedLakeIds.length === 0}
+            >
+              Usuń
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="lakes-list">
         {lakes.length === 0 ? (
           <div className="empty-state">
@@ -103,6 +198,14 @@ const ManageLakes = () => {
           <div className="lakes-grid">
             {lakes.map((lake) => (
               <div key={lake._id} className="lake-admin-card">
+                <div className="lake-admin-select">
+                  <input
+                    type="checkbox"
+                    checked={selectedLakeIds.includes(lake._id)}
+                    onChange={() => toggleLakeSelection(lake._id)}
+                    aria-label={`Zaznacz ${lake.name}`}
+                  />
+                </div>
                 {lake.imageUrl && (
                   <img
                     src={`http://localhost:5000${lake.imageUrl}`}
@@ -114,6 +217,9 @@ const ManageLakes = () => {
                   <h3>{lake.name}</h3>
                   <p className="lake-location">{lake.location}</p>
                   <p className="lake-description">{lake.description}</p>
+                  <span className={`status-badge ${lake.isActive ? 'status-confirmed' : 'status-cancelled'}`}>
+                    {lake.isActive ? 'Aktywne' : 'Nieaktywne'}
+                  </span>
                 </div>
                 <div className="lake-actions">
                   <button

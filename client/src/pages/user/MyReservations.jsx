@@ -77,6 +77,57 @@ const MyReservations = () => {
     return new Date(date) < today;
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExportCsv = () => {
+    if (sortedReservations.length === 0) {
+      alert('Brak rezerwacji do eksportu');
+      return;
+    }
+
+    const escapeCell = (value) => {
+      if (value === null || value === undefined) return '';
+      const str = String(value).replace(/\"/g, '\"\"');
+      return `"${str}"`;
+    };
+
+    const header = [
+      'Jezioro',
+      'Lokalizacja',
+      'Stanowisko',
+      'Data rezerwacji',
+      'Status',
+      'Utworzona',
+      'Notatki'
+    ];
+
+    const rows = sortedReservations.map((reservation) => ([
+      reservation.lakeId?.name || '',
+      reservation.lakeId?.location || '',
+      reservation.spotId?.name || '',
+      new Date(reservation.date).toISOString().split('T')[0],
+      reservation.status,
+      new Date(reservation.createdAt).toISOString().split('T')[0],
+      reservation.notes || ''
+    ]));
+
+    const csvContent = [header, ...rows]
+      .map((row) => row.map(escapeCell).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'rezerwacje.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const filteredReservations = reservations.filter((reservation) => {
     if (statusFilter !== 'all' && reservation.status !== statusFilter) {
       return false;
@@ -124,10 +175,21 @@ const MyReservations = () => {
   return (
     <div className="page-container">
       <div className="my-reservations-header">
-        <h1>Moje Rezerwacje</h1>
-        <button onClick={() => navigate('/lakes')} className="btn-primary">
-          + Nowa Rezerwacja
-        </button>
+        <div>
+          <h1>Moje Rezerwacje</h1>
+          <p className="reservations-subtitle">Zarządzaj swoimi rezerwacjami i historią wizyt</p>
+        </div>
+        <div className="my-reservations-actions">
+          <button onClick={() => navigate('/lakes')} className="btn-primary">
+            + Nowa Rezerwacja
+          </button>
+          <button onClick={handleExportCsv} className="btn-secondary">
+            Eksport CSV
+          </button>
+          <button onClick={handlePrint} className="btn-secondary">
+            Drukuj
+          </button>
+        </div>
       </div>
 
       {error && (

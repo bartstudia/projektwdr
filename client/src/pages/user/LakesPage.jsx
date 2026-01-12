@@ -29,7 +29,10 @@ const LakesPage = () => {
     try {
       setLoading(true);
       const data = await lakeService.getAllLakes();
-      setLakes(data.lakes || []);
+      const activeLakes = (data.lakes || []).filter(
+        (lake) => lake.isActive !== false
+      );
+      setLakes(activeLakes);
       setError('');
     } catch (err) {
       setError(err.message || 'Błąd podczas ładowania jezior');
