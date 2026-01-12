@@ -64,6 +64,14 @@ const run = async () => {
     isActive: true
   });
 
+  await Lake.create({
+    name: 'Jezioro Bez Stanowisk',
+    description: 'Jezioro bez stanowisk do testow pustego stanu.',
+    location: 'Brakowo',
+    createdBy: admin._id,
+    isActive: true
+  });
+
   await FishingSpot.insertMany([
     {
       lakeId: lake._id,
