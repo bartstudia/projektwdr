@@ -6,7 +6,7 @@ import ImageMap from '../../components/user/ImageMap';
 import ReviewList from '../../components/user/ReviewList';
 import ReviewForm from '../../components/user/ReviewForm';
 import { useAuth } from '../../context/AuthContext';
-import Calendar from 'react-calendar';
+import Calendar from 'react-calendar/dist/umd/Calendar';
 import 'react-calendar/dist/Calendar.css';
 
 const LakeDetailPage = () => {
