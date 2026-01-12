@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const LakeCard = ({ lake, availability, availabilityDate }) => {
+const LakeCard = ({ lake }) => {
   return (
     <div className="lake-card">
       {lake.imageUrl && (
@@ -23,14 +23,6 @@ const LakeCard = ({ lake, availability, availabilityDate }) => {
             ? `${lake.description.substring(0, 150)}...`
             : lake.description}
         </p>
-        {availabilityDate && availability && (
-          <div className="lake-availability">
-            <span className="availability-label">Dostępność:</span>
-            <span className={`availability-count ${availability.availableCount > 0 ? 'available' : 'unavailable'}`}>
-              {availability.availableCount} / {availability.totalSpots}
-            </span>
-          </div>
-        )}
         <Link to={`/lakes/${lake._id}`} className="btn-primary btn-card">
           Zobacz szczegóły
         </Link>

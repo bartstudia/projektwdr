@@ -1,32 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
-const ImageMapEditor = ({
-  lakeImage,
-  onSave,
-  existingSpots = [],
-  lake,
-  highlightedSpotId = null,
-  initialShape = 'circle'
-}) => {
+const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
   const [clickedPoints, setClickedPoints] = useState([]);
-  const [shape, setShape] = useState(initialShape);
+  const [shape, setShape] = useState('circle');
   const [previewCoords, setPreviewCoords] = useState(null);
-  const [hoverPoint, setHoverPoint] = useState(null);
   const imageRef = useRef(null);
-
-  const handleReset = () => {
-    setClickedPoints([]);
-    setPreviewCoords(null);
-    setHoverPoint(null);
-  };
-
-  useEffect(() => {
-    if (initialShape) {
-      setShape(initialShape);
-      handleReset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialShape]);
 
   const handleImageClick = (e) => {
     if (!imageRef.current) return;
@@ -38,7 +16,6 @@ const ImageMapEditor = ({
     const newPoint = { x, y };
     const updatedPoints = [...clickedPoints, newPoint];
     setClickedPoints(updatedPoints);
-    setHoverPoint(null);
 
     // Auto-complete based on shape
     if (shape === 'circle' && updatedPoints.length === 2) {
@@ -71,8 +48,6 @@ const ImageMapEditor = ({
       setPreviewCoords({ shape: 'circle', x: clickedPoints[0].x, y: clickedPoints[0].y, radius });
     } else if (shape === 'rect' && clickedPoints.length === 1) {
       setPreviewCoords({ shape: 'rect', x1: clickedPoints[0].x, y1: clickedPoints[0].y, x2: x, y2: y });
-    } else if (shape === 'poly') {
-      setHoverPoint({ x, y });
     }
   };
 
@@ -81,9 +56,9 @@ const ImageMapEditor = ({
     handleReset();
   };
 
-  const handleUndoLastPoint = () => {
-    if (clickedPoints.length === 0) return;
-    setClickedPoints((prev) => prev.slice(0, -1));
+  const handleReset = () => {
+    setClickedPoints([]);
+    setPreviewCoords(null);
   };
 
   const handlePolygonComplete = () => {
@@ -118,11 +93,6 @@ const ImageMapEditor = ({
             {shape === 'poly' && clickedPoints.length >= 3 && (
               <button type="button" onClick={handlePolygonComplete} className="btn-primary btn-small">
                 Zakończ wielokąt
-              </button>
-            )}
-            {shape === 'poly' && (
-              <button type="button" onClick={handleUndoLastPoint} className="btn-secondary btn-small">
-                Cofnij punkt
               </button>
             )}
             <button type="button" onClick={handleReset} className="btn-secondary btn-small">
@@ -162,12 +132,6 @@ const ImageMapEditor = ({
               <span className="legend-color existing-spot-color"></span>
               <span>Istniejące stanowiska ({existingSpots.length})</span>
             </div>
-            {highlightedSpotId && (
-              <div className="legend-item">
-                <span className="legend-color editing-spot-color"></span>
-                <span>Edytowane stanowisko</span>
-              </div>
-            )}
             <div className="legend-item">
               <span className="legend-color new-spot-color"></span>
               <span>Nowe stanowisko (w trakcie tworzenia)</span>
@@ -245,17 +209,6 @@ const ImageMapEditor = ({
                 />
               );
             })}
-            {hoverPoint && clickedPoints.length > 0 && (
-              <line
-                x1={clickedPoints[clickedPoints.length - 1].x}
-                y1={clickedPoints[clickedPoints.length - 1].y}
-                x2={hoverPoint.x}
-                y2={hoverPoint.y}
-                stroke="#90caf9"
-                strokeWidth="2"
-                strokeDasharray="4 6"
-              />
-            )}
           </svg>
         )}
 
@@ -275,9 +228,8 @@ const ImageMapEditor = ({
           >
             {existingSpots.map((spot) => {
               const coords = spot.mapCoordinates.coords;
-              const isHighlighted = highlightedSpotId === spot._id;
-              const fillColor = isHighlighted ? 'rgba(255, 152, 0, 0.25)' : 'rgba(158, 158, 158, 0.3)';
-              const strokeColor = isHighlighted ? '#fb8c00' : '#757575';
+              const fillColor = 'rgba(158, 158, 158, 0.3)'; // Szary półprzezroczysty
+              const strokeColor = '#757575';
 
               if (spot.mapCoordinates.shape === 'circle') {
                 return (

@@ -10,17 +10,11 @@ const AdminSpots = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedLake, setSelectedLake] = useState('');
-  const [selectedSpotIds, setSelectedSpotIds] = useState([]);
-  const [bulkLoading, setBulkLoading] = useState(false);
 
   useEffect(() => {
     fetchLakes();
     fetchAllSpots();
   }, []);
-
-  useEffect(() => {
-    setSelectedSpotIds((prev) => prev.filter((id) => spots.some((spot) => spot._id === id)));
-  }, [spots]);
 
   const fetchLakes = async () => {
     try {
@@ -93,69 +87,6 @@ const AdminSpots = () => {
       }
     } catch (err) {
       alert(err.message || 'Błąd podczas zmiany statusu stanowiska');
-    }
-  };
-
-  const toggleSpotSelection = (spotId) => {
-    setSelectedSpotIds((prev) => (
-      prev.includes(spotId) ? prev.filter((id) => id !== spotId) : [...prev, spotId]
-    ));
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedSpotIds.length === spots.length) {
-      setSelectedSpotIds([]);
-      return;
-    }
-    setSelectedSpotIds(spots.map((spot) => spot._id));
-  };
-
-  const handleBulkUpdate = async (isActive) => {
-    if (selectedSpotIds.length === 0) return;
-
-    try {
-      setBulkLoading(true);
-      await Promise.all(
-        spots
-          .filter((spot) => selectedSpotIds.includes(spot._id))
-          .filter((spot) => spot.isActive !== isActive)
-          .map((spot) => spotService.updateSpot(spot._id, { isActive }))
-      );
-      if (selectedLake) {
-        await handleLakeFilterChange(selectedLake);
-      } else {
-        await fetchAllSpots();
-      }
-      setSelectedSpotIds([]);
-    } catch (err) {
-      alert(err.message || 'Błąd podczas masowej aktualizacji');
-    } finally {
-      setBulkLoading(false);
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedSpotIds.length === 0) return;
-
-    if (!window.confirm('Czy na pewno chcesz usunąć wybrane stanowiska?')) {
-      return;
-    }
-
-    try {
-      setBulkLoading(true);
-      await Promise.all(
-        selectedSpotIds.map((spotId) => spotService.deleteSpot(spotId))
-      );
-      if (selectedLake) {
-        await handleLakeFilterChange(selectedLake);
-      } else {
-        await fetchAllSpots();
-      }
-      setSelectedSpotIds([]);
-    } catch (err) {
-      alert(err.message || 'Błąd podczas masowego usuwania');
-    } finally {
-      setBulkLoading(false);
     }
   };
 
@@ -240,37 +171,6 @@ const AdminSpots = () => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {spots.length > 0 && (
-        <div className="bulk-actions-bar">
-          <div className="bulk-info">
-            Zaznaczono: {selectedSpotIds.length}
-          </div>
-          <div className="bulk-actions">
-            <button
-              onClick={() => handleBulkUpdate(true)}
-              className="btn-primary btn-small"
-              disabled={bulkLoading || selectedSpotIds.length === 0}
-            >
-              Aktywuj
-            </button>
-            <button
-              onClick={() => handleBulkUpdate(false)}
-              className="btn-secondary btn-small"
-              disabled={bulkLoading || selectedSpotIds.length === 0}
-            >
-              Dezaktywuj
-            </button>
-            <button
-              onClick={handleBulkDelete}
-              className="btn-danger btn-small"
-              disabled={bulkLoading || selectedSpotIds.length === 0}
-            >
-              Usuń
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Lista stanowisk */}
       {spots.length === 0 ? (
         <div className="empty-state">
@@ -284,14 +184,6 @@ const AdminSpots = () => {
           <table className="admin-table">
             <thead>
               <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={spots.length > 0 && selectedSpotIds.length === spots.length}
-                    onChange={toggleSelectAll}
-                    aria-label="Zaznacz wszystkie"
-                  />
-                </th>
                 <th>Nazwa stanowiska</th>
                 <th>Jezioro</th>
                 <th>Opis</th>
@@ -303,14 +195,6 @@ const AdminSpots = () => {
             <tbody>
               {spots.map((spot) => (
                 <tr key={spot._id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedSpotIds.includes(spot._id)}
-                      onChange={() => toggleSpotSelection(spot._id)}
-                      aria-label={`Zaznacz ${spot.name}`}
-                    />
-                  </td>
                   <td>
                     <strong>{spot.name}</strong>
                   </td>
