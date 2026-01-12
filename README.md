@@ -499,3 +499,16 @@ ISC
 **Jeśli coś nie działa - sprawdź FAQ lub otwórz Issue na GitHubie!** 😊
 
 **Powodzenia z wędkowaniem!** 🎣
+
+
+## API Update (admin/stats + availability)
+
+Additional endpoints now available:
+- GET /api/admin/stats
+- GET /api/reservations/lake/:lakeId/availability?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+- GET /api/reservations/lake/:lakeId/date/:date
+- GET /api/reservations/admin/all
+
+Notes:
+- Rezerwacje maja statusy: pending, confirmed, cancelled.
+- Opinie nie wymagaja moderacji.
