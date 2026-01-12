@@ -30,6 +30,10 @@ const LakeSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
   gpsLink: {
     type: String,
     default: null
@@ -40,6 +44,21 @@ const LakeSchema = new mongoose.Schema({
   },
   longitude: {
     type: Number,
+    default: null
+  },
+  rules: {
+    type: String,
+    maxlength: [2000, 'Regulamin może mieć maksymalnie 2000 znaków'],
+    default: null
+  },
+  fees: {
+    type: String,
+    maxlength: [1000, 'Opłaty mogą mieć maksymalnie 1000 znaków'],
+    default: null
+  },
+  contactInfo: {
+    type: String,
+    maxlength: [500, 'Kontakt może mieć maksymalnie 500 znaków'],
     default: null
   },
   createdBy: {

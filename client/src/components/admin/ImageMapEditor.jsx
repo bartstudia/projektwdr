@@ -14,6 +14,94 @@ const ImageMapEditor = ({
   const [hoverPoint, setHoverPoint] = useState(null);
   const imageRef = useRef(null);
 
+  const MIN_SIZE = 8;
+
+  const getBoundingBox = (shape, coords) => {
+    if (!coords || coords.length < 2) {
+      return null;
+    }
+
+    if (shape === 'circle') {
+      const [x, y, radius] = coords;
+      return {
+        minX: x - radius,
+        minY: y - radius,
+        maxX: x + radius,
+        maxY: y + radius
+      };
+    }
+
+    if (shape === 'rect') {
+      const [x1, y1, x2, y2] = coords;
+      return {
+        minX: Math.min(x1, x2),
+        minY: Math.min(y1, y2),
+        maxX: Math.max(x1, x2),
+        maxY: Math.max(y1, y2)
+      };
+    }
+
+    const xs = [];
+    const ys = [];
+    for (let i = 0; i < coords.length; i += 2) {
+      xs.push(coords[i]);
+      ys.push(coords[i + 1]);
+    }
+    return {
+      minX: Math.min(...xs),
+      minY: Math.min(...ys),
+      maxX: Math.max(...xs),
+      maxY: Math.max(...ys)
+    };
+  };
+
+  const isOverlapping = (boxA, boxB) => {
+    if (!boxA || !boxB) return false;
+    return !(
+      boxA.maxX < boxB.minX ||
+      boxA.minX > boxB.maxX ||
+      boxA.maxY < boxB.minY ||
+      boxA.minY > boxB.maxY
+    );
+  };
+
+  const validateMapCoordinates = (mapCoordinates) => {
+    const { shape: targetShape, coords } = mapCoordinates;
+
+    if (targetShape === 'circle') {
+      if (coords[2] < MIN_SIZE) {
+        alert('Okrąg jest zbyt mały. Zwiększ promień.');
+        return false;
+      }
+    } else if (targetShape === 'rect') {
+      const width = Math.abs(coords[2] - coords[0]);
+      const height = Math.abs(coords[3] - coords[1]);
+      if (width < MIN_SIZE || height < MIN_SIZE) {
+        alert('Prostokąt jest zbyt mały. Zwiększ rozmiar.');
+        return false;
+      }
+    } else if (targetShape === 'poly') {
+      const box = getBoundingBox(targetShape, coords);
+      if (box && (box.maxX - box.minX < MIN_SIZE || box.maxY - box.minY < MIN_SIZE)) {
+        alert('Wielokąt jest zbyt mały. Zaznacz większy obszar.');
+        return false;
+      }
+    }
+
+    const newBox = getBoundingBox(targetShape, coords);
+    const hasOverlap = existingSpots.some((spot) => {
+      if (highlightedSpotId && spot._id === highlightedSpotId) return false;
+      const spotBox = getBoundingBox(spot.mapCoordinates.shape, spot.mapCoordinates.coords);
+      return isOverlapping(newBox, spotBox);
+    });
+
+    if (hasOverlap) {
+      return window.confirm('Nowy obszar nakłada się na istniejące stanowisko. Czy chcesz kontynuować?');
+    }
+
+    return true;
+  };
+
   const handleReset = () => {
     setClickedPoints([]);
     setPreviewCoords(null);
@@ -77,6 +165,9 @@ const ImageMapEditor = ({
   };
 
   const handleComplete = (mapCoordinates) => {
+    if (!validateMapCoordinates(mapCoordinates)) {
+      return;
+    }
     onSave(mapCoordinates);
     handleReset();
   };

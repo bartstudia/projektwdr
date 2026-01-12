@@ -12,6 +12,7 @@ const LakesPage = () => {
   const [availabilityOnly, setAvailabilityOnly] = useState(false);
   const [availabilityByLake, setAvailabilityByLake] = useState({});
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [sortBy, setSortBy] = useState('name-asc');
 
   useEffect(() => {
     fetchLakes();
@@ -29,7 +30,10 @@ const LakesPage = () => {
     try {
       setLoading(true);
       const data = await lakeService.getAllLakes();
-      setLakes(data.lakes || []);
+      const activeLakes = (data.lakes || []).filter(
+        (lake) => lake.isActive !== false
+      );
+      setLakes(activeLakes);
       setError('');
     } catch (err) {
       setError(err.message || 'Błąd podczas ładowania jezior');
@@ -79,10 +83,31 @@ const LakesPage = () => {
 
   const availabilityFilteredLakes = availabilityOnly && availabilityDate
     ? filteredLakes.filter((lake) => {
+        if (availabilityLoading) return true;
         const availability = availabilityByLake[lake._id];
         return availability ? availability.availableCount > 0 : false;
       })
     : filteredLakes;
+
+  const sortedLakes = [...availabilityFilteredLakes].sort((a, b) => {
+    if (sortBy === 'name-desc') {
+      return b.name.localeCompare(a.name);
+    }
+    if (sortBy === 'location-asc') {
+      return a.location.localeCompare(b.location);
+    }
+    if (sortBy === 'location-desc') {
+      return b.location.localeCompare(a.location);
+    }
+    if (sortBy === 'availability-desc' || sortBy === 'availability-asc') {
+      const availabilityA = availabilityByLake[a._id]?.availableCount ?? 0;
+      const availabilityB = availabilityByLake[b._id]?.availableCount ?? 0;
+      return sortBy === 'availability-desc'
+        ? availabilityB - availabilityA
+        : availabilityA - availabilityB;
+    }
+    return a.name.localeCompare(b.name);
+  });
 
   if (loading) {
     return (
@@ -137,12 +162,28 @@ const LakesPage = () => {
           />
           Pokaż tylko jeziora z wolnymi stanowiskami
         </label>
+        <div className="filter-group">
+          <label htmlFor="sortBy">Sortowanie:</label>
+          <select
+            id="sortBy"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="name-asc">Nazwa A-Z</option>
+            <option value="name-desc">Nazwa Z-A</option>
+            <option value="location-asc">Lokalizacja A-Z</option>
+            <option value="location-desc">Lokalizacja Z-A</option>
+            <option value="availability-desc">Dostepnosc: najwiecej</option>
+            <option value="availability-asc">Dostepnosc: najmniej</option>
+          </select>
+        </div>
+
         {availabilityOnly && availabilityDate && availabilityLoading && (
           <span className="availability-loading">Sprawdzanie dostępności...</span>
         )}
       </div>
 
-      {availabilityFilteredLakes.length === 0 ? (
+      {sortedLakes.length === 0 ? (
         <div className="empty-state">
           {searchTerm ? (
             <p>Nie znaleziono jezior pasujących do "{searchTerm}"</p>
@@ -152,12 +193,13 @@ const LakesPage = () => {
         </div>
       ) : (
         <div className="lakes-grid-user">
-          {availabilityFilteredLakes.map((lake) => (
+          {sortedLakes.map((lake) => (
             <LakeCard
               key={lake._id}
               lake={lake}
               availability={availabilityByLake[lake._id]}
               availabilityDate={availabilityDate}
+              availabilityLoading={availabilityLoading}
             />
           ))}
         </div>

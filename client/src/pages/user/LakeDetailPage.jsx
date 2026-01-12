@@ -321,6 +321,18 @@ const LakeDetailPage = () => {
                   }
                   return classes.join(' ');
                 }}
+                tileContent={({ date, view }) => {
+                  if (view !== 'month' || availabilityTotalSpots === 0) return null;
+                  const key = date.toISOString().split('T')[0];
+                  const info = availabilityByDate[key];
+                  if (!info) return null;
+                  const tooltip = `Dostępne: ${info.availableCount}/${availabilityTotalSpots}`;
+                  return (
+                    <span className="calendar-availability" title={tooltip}>
+                      {info.availableCount}/{availabilityTotalSpots}
+                    </span>
+                  );
+                }}
                 minDate={today}
                 maxDate={(() => {
                   const maxDate = new Date();
@@ -345,6 +357,11 @@ const LakeDetailPage = () => {
                 <span>Wybrane</span>
               </div>
             </div>
+            {availabilityTotalSpots === 0 && (
+              <div className="calendar-empty-note">
+                Brak aktywnych stanowisk dla tego jeziora.
+              </div>
+            )}
           </div>
           {selectedDate && (
             <div className="availability-info">
@@ -364,6 +381,7 @@ const LakeDetailPage = () => {
                   onClick={handleReserveFirstAvailable}
                   className="btn-primary btn-small"
                   disabled={availableCount === 0}
+                  data-testid="reserve-first-available"
                 >
                   Zarezerwuj pierwsze dostępne
                 </button>
@@ -385,6 +403,29 @@ const LakeDetailPage = () => {
           <h2>Opis jeziora</h2>
           <p>{lake.description}</p>
         </div>
+
+        {(lake.rules || lake.fees || lake.contactInfo) && (
+          <div className="lake-extra-info">
+            {lake.rules && (
+              <div className="lake-info-section">
+                <h3>Regulamin</h3>
+                <p>{lake.rules}</p>
+              </div>
+            )}
+            {lake.fees && (
+              <div className="lake-info-section">
+                <h3>Opłaty</h3>
+                <p>{lake.fees}</p>
+              </div>
+            )}
+            {lake.contactInfo && (
+              <div className="lake-info-section">
+                <h3>Kontakt</h3>
+                <p>{lake.contactInfo}</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {embedUrl && (
           <div className="lake-location-section">
