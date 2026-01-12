@@ -200,6 +200,7 @@ const LakeDetailPage = () => {
   const mapTarget = hasSpotLocation ? selectedSpot : lake;
   const embedUrl = buildEmbedUrl(mapTarget);
   const mapLink = buildMapLink(mapTarget);
+  const availableCount = getAvailableSpotsCount();
 
   return (
     <div className="page-container">
@@ -235,31 +236,39 @@ const LakeDetailPage = () => {
               className="date-input-large"
             />
           </div>
-          {selectedDate && (
-            <div className="availability-info">
-              <div className="availability-stat">
-                <span className="stat-label">Dostępne stanowiska:</span>
-                <span className="stat-value available">{getAvailableSpotsCount()} / {spots.length}</span>
+            {selectedDate && (
+              <div className="availability-info">
+                <div className="availability-stat">
+                  <span className="stat-label">Dostępne stanowiska:</span>
+                  <span className="stat-value available">{availableCount} / {spots.length}</span>
+                </div>
+                <div className="availability-stat">
+                  <span className="stat-label">Zarezerwowane:</span>
+                  <span className="stat-value reserved">{reservedSpotIds.length}</span>
+                </div>
               </div>
-              <div className="availability-stat">
-                <span className="stat-label">Zarezerwowane:</span>
-                <span className="stat-value reserved">{reservedSpotIds.length}</span>
+            )}
+            {selectedDate && spots.length > 0 && (
+              <div className="availability-actions">
+                <button
+                  onClick={handleReserveFirstAvailable}
+                  className="btn-primary btn-small"
+                  disabled={availableCount === 0}
+                >
+                  Zarezerwuj pierwsze dostępne
+                </button>
+                <a href="#spots-list" className="btn-secondary btn-small">
+                  Przejdź do listy stanowisk
+                </a>
+                {availableCount === 0 && (
+                  <span className="availability-note">
+                    Brak wolnych stanowisk na wybrany termin.
+                  </span>
+                )}
               </div>
-            </div>
-          )}
-          {selectedDate && spots.length > 0 && (
-            <div className="availability-actions">
-              <button
-                onClick={handleReserveFirstAvailable}
-                className="btn-primary btn-small"
-                disabled={getAvailableSpotsCount() === 0}
-              >
-                Zarezerwuj pierwsze dostępne
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
 
       <div className="lake-detail-content">
         <div className="lake-description-section">
@@ -319,9 +328,9 @@ const LakeDetailPage = () => {
           </div>
         )}
 
-        {spots.length > 0 && (
-          <div className="spots-list-section">
-            <h2>Dostępne stanowiska ({getAvailableSpotsCount()} / {spots.length})</h2>
+          {spots.length > 0 && (
+            <div className="spots-list-section" id="spots-list">
+              <h2>Dostępne stanowiska ({availableCount} / {spots.length})</h2>
             <div className="spots-list">
               {spots.map((spot) => {
                 const isReserved = isSpotReserved(spot._id);

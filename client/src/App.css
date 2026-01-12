@@ -1264,7 +1264,15 @@ body {
 .availability-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   width: 100%;
+}
+
+.availability-note {
+  color: #c62828;
+  font-weight: 600;
 }
 
 .date-input-group {
@@ -1526,6 +1534,13 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.spot-editor-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
 .editor-info {
   background: var(--primary-light);
   padding: 1rem;
@@ -1719,6 +1734,11 @@ body {
 .legend-color.existing-spot-color {
   background: rgba(158, 158, 158, 0.3);
   border-color: #757575;
+}
+
+.legend-color.editing-spot-color {
+  background: rgba(255, 152, 0, 0.25);
+  border-color: #fb8c00;
 }
 
 .legend-color.new-spot-color {

@@ -1,11 +1,32 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
+const ImageMapEditor = ({
+  lakeImage,
+  onSave,
+  existingSpots = [],
+  lake,
+  highlightedSpotId = null,
+  initialShape = 'circle'
+}) => {
   const [clickedPoints, setClickedPoints] = useState([]);
-  const [shape, setShape] = useState('circle');
+  const [shape, setShape] = useState(initialShape);
   const [previewCoords, setPreviewCoords] = useState(null);
   const [hoverPoint, setHoverPoint] = useState(null);
   const imageRef = useRef(null);
+
+  const handleReset = () => {
+    setClickedPoints([]);
+    setPreviewCoords(null);
+    setHoverPoint(null);
+  };
+
+  useEffect(() => {
+    if (initialShape) {
+      setShape(initialShape);
+      handleReset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialShape]);
 
   const handleImageClick = (e) => {
     if (!imageRef.current) return;
@@ -58,12 +79,6 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
   const handleComplete = (mapCoordinates) => {
     onSave(mapCoordinates);
     handleReset();
-  };
-
-  const handleReset = () => {
-    setClickedPoints([]);
-    setPreviewCoords(null);
-    setHoverPoint(null);
   };
 
   const handleUndoLastPoint = () => {
@@ -147,6 +162,12 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
               <span className="legend-color existing-spot-color"></span>
               <span>Istniejące stanowiska ({existingSpots.length})</span>
             </div>
+            {highlightedSpotId && (
+              <div className="legend-item">
+                <span className="legend-color editing-spot-color"></span>
+                <span>Edytowane stanowisko</span>
+              </div>
+            )}
             <div className="legend-item">
               <span className="legend-color new-spot-color"></span>
               <span>Nowe stanowisko (w trakcie tworzenia)</span>
@@ -254,8 +275,9 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
           >
             {existingSpots.map((spot) => {
               const coords = spot.mapCoordinates.coords;
-              const fillColor = 'rgba(158, 158, 158, 0.3)'; // Szary półprzezroczysty
-              const strokeColor = '#757575';
+              const isHighlighted = highlightedSpotId === spot._id;
+              const fillColor = isHighlighted ? 'rgba(255, 152, 0, 0.25)' : 'rgba(158, 158, 158, 0.3)';
+              const strokeColor = isHighlighted ? '#fb8c00' : '#757575';
 
               if (spot.mapCoordinates.shape === 'circle') {
                 return (
