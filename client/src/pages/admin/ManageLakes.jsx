@@ -11,6 +11,8 @@ const ManageLakes = () => {
   const [editingLake, setEditingLake] = useState(null);
   const [selectedLakeIds, setSelectedLakeIds] = useState([]);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchLakes();
@@ -53,11 +55,11 @@ const ManageLakes = () => {
   };
 
   const toggleSelectAll = () => {
-    if (selectedLakeIds.length === lakes.length) {
+    if (selectedLakeIds.length === filteredLakes.length) {
       setSelectedLakeIds([]);
       return;
     }
-    setSelectedLakeIds(lakes.map((lake) => lake._id));
+    setSelectedLakeIds(filteredLakes.map((lake) => lake._id));
   };
 
   const handleBulkUpdate = async (isActive) => {
@@ -114,6 +116,18 @@ const ManageLakes = () => {
     setEditingLake(null);
   };
 
+  const filteredLakes = lakes.filter((lake) => {
+    if (statusFilter === 'active' && !lake.isActive) return false;
+    if (statusFilter === 'inactive' && lake.isActive) return false;
+
+    const search = searchTerm.trim().toLowerCase();
+    if (!search) return true;
+
+    return [lake.name, lake.location]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(search));
+  });
+
   if (loading) {
     return (
       <div className="page-container">
@@ -152,13 +166,44 @@ const ManageLakes = () => {
         </div>
       )}
 
-      {lakes.length > 0 && (
+      <div className="filters-section">
+        <h3>Filtry</h3>
+        <div className="filters-grid">
+          <div className="form-group">
+            <label htmlFor="statusFilter">Status:</label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">Wszystkie</option>
+              <option value="active">Aktywne</option>
+              <option value="inactive">Nieaktywne</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="lakeSearch">Szukaj:</label>
+            <input
+              id="lakeSearch"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Nazwa lub lokalizacja..."
+            />
+          </div>
+        </div>
+        <div className="filter-actions">
+          <span className="filter-summary">Widocznych: {filteredLakes.length}</span>
+        </div>
+      </div>
+
+      {filteredLakes.length > 0 && (
         <div className="bulk-actions-bar">
           <div className="bulk-info">Zaznaczono: {selectedLakeIds.length}</div>
           <label className="bulk-select-all">
             <input
               type="checkbox"
-              checked={selectedLakeIds.length === lakes.length}
+              checked={selectedLakeIds.length === filteredLakes.length && filteredLakes.length > 0}
               onChange={toggleSelectAll}
             />
             Zaznacz wszystkie
@@ -190,13 +235,13 @@ const ManageLakes = () => {
       )}
 
       <div className="lakes-list">
-        {lakes.length === 0 ? (
+        {filteredLakes.length === 0 ? (
           <div className="empty-state">
-            <p>Brak jezior w systemie. Dodaj pierwsze jezioro!</p>
+            <p>Brak jezior spełniających kryteria.</p>
           </div>
         ) : (
           <div className="lakes-grid">
-            {lakes.map((lake) => (
+            {filteredLakes.map((lake) => (
               <div key={lake._id} className="lake-admin-card">
                 <div className="lake-admin-select">
                   <input
