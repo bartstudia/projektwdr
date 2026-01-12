@@ -61,7 +61,7 @@ exports.getLakeById = async (req, res) => {
 // @access  Private (Admin)
 exports.createLake = async (req, res) => {
   try {
-    const { name, description, location } = req.body;
+    const { name, description, location, gpsLink, latitude, longitude } = req.body;
 
     // Walidacja
     if (!name || !description || !location) {
@@ -83,6 +83,9 @@ exports.createLake = async (req, res) => {
       name,
       description,
       location,
+      gpsLink: gpsLink || null,
+      latitude: latitude !== undefined ? latitude : null,
+      longitude: longitude !== undefined ? longitude : null,
       createdBy: req.userId
     });
 
@@ -113,7 +116,7 @@ exports.createLake = async (req, res) => {
 // @access  Private (Admin)
 exports.updateLake = async (req, res) => {
   try {
-    const { name, description, location } = req.body;
+    const { name, description, location, gpsLink, latitude, longitude } = req.body;
 
     const lake = await Lake.findById(req.params.id);
 
@@ -137,6 +140,9 @@ exports.updateLake = async (req, res) => {
     if (name) lake.name = name;
     if (description) lake.description = description;
     if (location) lake.location = location;
+    if (gpsLink !== undefined) lake.gpsLink = gpsLink || null;
+    if (latitude !== undefined) lake.latitude = latitude;
+    if (longitude !== undefined) lake.longitude = longitude;
 
     await lake.save();
 

@@ -7,12 +7,14 @@ const {
   cancelReservation,
   getReservedDates,
   getReservedSpotsForDate,
+  getLakeAvailability,
   getAllReservations
 } = require('../controllers/reservationController');
 const { protect, adminOnly } = require('../middleware/auth');
 
 // Public routes (dostępność stanowisk dla wszystkich)
 router.get('/lake/:lakeId/date/:date', getReservedSpotsForDate);
+router.get('/lake/:lakeId/availability', getLakeAvailability);
 
 // Protected routes
 router.use(protect);

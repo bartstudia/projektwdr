@@ -12,9 +12,22 @@ const ManageSpots = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showEditor, setShowEditor] = useState(false);
+  const [editingSpot, setEditingSpot] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
   const [newSpot, setNewSpot] = useState({
     name: '',
-    description: ''
+    description: '',
+    gpsLink: '',
+    latitude: '',
+    longitude: ''
+  });
+  const [editSpot, setEditSpot] = useState({
+    name: '',
+    description: '',
+    gpsLink: '',
+    latitude: '',
+    longitude: '',
+    isActive: true
   });
 
   useEffect(() => {
@@ -47,14 +60,105 @@ const ManageSpots = () => {
         lakeId,
         name: newSpot.name,
         description: newSpot.description,
-        mapCoordinates
+        mapCoordinates,
+        gpsLink: newSpot.gpsLink.trim() || null,
+        latitude: newSpot.latitude !== '' ? Number(newSpot.latitude) : null,
+        longitude: newSpot.longitude !== '' ? Number(newSpot.longitude) : null
       });
 
-      setNewSpot({ name: '', description: '' });
+      setNewSpot({
+        name: '',
+        description: '',
+        gpsLink: '',
+        latitude: '',
+        longitude: ''
+      });
       setShowEditor(false);
       fetchData();
     } catch (err) {
       alert(err.message || 'Błąd podczas tworzenia stanowiska');
+    }
+  };
+
+  const handleEditSpotStart = (spot) => {
+    if (!lake.imageUrl) {
+      alert('Jezioro musi mieć obraz przed edycją stanowisk');
+      return;
+    }
+    setShowEditor(false);
+    setEditingSpot(spot);
+    setEditSpot({
+      name: spot.name || '',
+      description: spot.description || '',
+      gpsLink: spot.gpsLink || '',
+      latitude: spot.latitude ?? '',
+      longitude: spot.longitude ?? '',
+      isActive: spot.isActive
+    });
+  };
+
+  const handleEditCancel = () => {
+    setEditingSpot(null);
+    setEditSpot({
+      name: '',
+      description: '',
+      gpsLink: '',
+      latitude: '',
+      longitude: '',
+      isActive: true
+    });
+  };
+
+  const handleEditSave = async () => {
+    if (!editingSpot) return;
+    if (!editSpot.name) {
+      alert('Proszę podać nazwę stanowiska');
+      return;
+    }
+
+    try {
+      setSavingEdit(true);
+      await spotService.updateSpot(editingSpot._id, {
+        name: editSpot.name,
+        description: editSpot.description,
+        gpsLink: editSpot.gpsLink.trim() || null,
+        latitude: editSpot.latitude !== '' ? Number(editSpot.latitude) : null,
+        longitude: editSpot.longitude !== '' ? Number(editSpot.longitude) : null,
+        isActive: editSpot.isActive
+      });
+      handleEditCancel();
+      fetchData();
+    } catch (err) {
+      alert(err.message || 'Błąd podczas zapisywania stanowiska');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleEditMapSave = async (mapCoordinates) => {
+    if (!editingSpot) return;
+    if (!editSpot.name) {
+      alert('Proszę podać nazwę stanowiska');
+      return;
+    }
+
+    try {
+      setSavingEdit(true);
+      await spotService.updateSpot(editingSpot._id, {
+        name: editSpot.name,
+        description: editSpot.description,
+        mapCoordinates,
+        gpsLink: editSpot.gpsLink.trim() || null,
+        latitude: editSpot.latitude !== '' ? Number(editSpot.latitude) : null,
+        longitude: editSpot.longitude !== '' ? Number(editSpot.longitude) : null,
+        isActive: editSpot.isActive
+      });
+      handleEditCancel();
+      fetchData();
+    } catch (err) {
+      alert(err.message || 'Błąd podczas aktualizacji mapy');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -76,6 +180,7 @@ const ManageSpots = () => {
       alert('Jezioro musi mieć obraz przed dodaniem stanowisk');
       return;
     }
+    setEditingSpot(null);
     setShowEditor(true);
   };
 
@@ -111,7 +216,7 @@ const ManageSpots = () => {
           <h1>Stanowiska - {lake?.name}</h1>
           <p>{lake?.location}</p>
         </div>
-        {!showEditor && (
+        {!showEditor && !editingSpot && (
           <button onClick={handleAddSpotClick} className="btn-primary">
             + Dodaj Stanowisko
           </button>
@@ -145,6 +250,37 @@ const ManageSpots = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="spotGpsLink">Link do mapy (opcjonalnie):</label>
+            <input
+              type="url"
+              id="spotGpsLink"
+              value={newSpot.gpsLink}
+              onChange={(e) => setNewSpot({ ...newSpot, gpsLink: e.target.value })}
+              placeholder="https://www.google.com/maps?q=..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Współrzędne GPS (opcjonalnie):</label>
+            <div className="gps-inputs">
+              <input
+                type="number"
+                value={newSpot.latitude}
+                onChange={(e) => setNewSpot({ ...newSpot, latitude: e.target.value })}
+                placeholder="Latitude"
+                step="0.000001"
+              />
+              <input
+                type="number"
+                value={newSpot.longitude}
+                onChange={(e) => setNewSpot({ ...newSpot, longitude: e.target.value })}
+                placeholder="Longitude"
+                step="0.000001"
+              />
+            </div>
+          </div>
+
           <p className="editor-info">
             Teraz kliknij na obrazie jeziora, aby zaznaczyć lokalizację stanowiska:
           </p>
@@ -159,12 +295,118 @@ const ManageSpots = () => {
           <button
             onClick={() => {
               setShowEditor(false);
-              setNewSpot({ name: '', description: '' });
+              setNewSpot({
+                name: '',
+                description: '',
+                gpsLink: '',
+                latitude: '',
+                longitude: ''
+              });
             }}
             className="btn-secondary"
           >
             Anuluj
           </button>
+        </div>
+      )}
+
+      {editingSpot && (
+        <div className="spot-editor-section">
+          <h2>Edytuj stanowisko: {editingSpot.name}</h2>
+
+          <div className="form-group">
+            <label htmlFor="editSpotName">Nazwa stanowiska*:</label>
+            <input
+              type="text"
+              id="editSpotName"
+              value={editSpot.name}
+              onChange={(e) => setEditSpot({ ...editSpot, name: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="editSpotDescription">Opis (opcjonalnie):</label>
+            <textarea
+              id="editSpotDescription"
+              value={editSpot.description}
+              onChange={(e) => setEditSpot({ ...editSpot, description: e.target.value })}
+              rows="3"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="editSpotGpsLink">Link do mapy (opcjonalnie):</label>
+            <input
+              type="url"
+              id="editSpotGpsLink"
+              value={editSpot.gpsLink}
+              onChange={(e) => setEditSpot({ ...editSpot, gpsLink: e.target.value })}
+              placeholder="https://www.google.com/maps?q=..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Współrzędne GPS (opcjonalnie):</label>
+            <div className="gps-inputs">
+              <input
+                type="number"
+                value={editSpot.latitude}
+                onChange={(e) => setEditSpot({ ...editSpot, latitude: e.target.value })}
+                placeholder="Latitude"
+                step="0.000001"
+              />
+              <input
+                type="number"
+                value={editSpot.longitude}
+                onChange={(e) => setEditSpot({ ...editSpot, longitude: e.target.value })}
+                placeholder="Longitude"
+                step="0.000001"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="editSpotActive">Status:</label>
+            <select
+              id="editSpotActive"
+              value={editSpot.isActive ? 'active' : 'inactive'}
+              onChange={(e) => setEditSpot({ ...editSpot, isActive: e.target.value === 'active' })}
+            >
+              <option value="active">Aktywne</option>
+              <option value="inactive">Nieaktywne</option>
+            </select>
+          </div>
+
+          <div className="spot-editor-actions">
+            <button
+              onClick={handleEditSave}
+              className="btn-primary"
+              disabled={savingEdit}
+            >
+              {savingEdit ? 'Zapisywanie...' : 'Zapisz dane'}
+            </button>
+            <button
+              onClick={handleEditCancel}
+              className="btn-secondary"
+              disabled={savingEdit}
+            >
+              Anuluj
+            </button>
+          </div>
+
+          <p className="editor-info">
+            Kliknij na obrazie, aby zmienić kształt stanowiska:
+          </p>
+
+          <ImageMapEditor
+            lakeImage={`http://localhost:5000${lake.imageUrl}`}
+            onSave={handleEditMapSave}
+            existingSpots={spots}
+            lake={lake}
+            highlightedSpotId={editingSpot._id}
+            initialShape={editingSpot.mapCoordinates?.shape || 'circle'}
+          />
         </div>
       )}
 
@@ -188,6 +430,12 @@ const ManageSpots = () => {
                   </span>
                 </div>
                 <div className="spot-actions">
+                  <button
+                    onClick={() => handleEditSpotStart(spot)}
+                    className="btn-secondary btn-small"
+                  >
+                    Edytuj
+                  </button>
                   <button
                     onClick={() => handleDeleteSpot(spot._id)}
                     className="btn-danger btn-small"

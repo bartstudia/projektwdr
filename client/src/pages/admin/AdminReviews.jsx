@@ -10,6 +10,9 @@ const AdminReviews = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedLake, setSelectedLake] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [minRating, setMinRating] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
 
   useEffect(() => {
     fetchLakes();
@@ -84,6 +87,35 @@ const AdminReviews = () => {
     return (sum / reviews.length).toFixed(1);
   };
 
+  const minValue = minRating === 'all' ? 0 : Number(minRating);
+  const filteredReviews = reviews.filter((review) => {
+    const search = searchTerm.trim().toLowerCase();
+    const matchesSearch = !search || [
+      review.userId?.name,
+      review.userId?.email,
+      review.lakeId?.name,
+      review.lakeId?.location,
+      review.comment
+    ]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(search));
+
+    return review.rating >= minValue && matchesSearch;
+  });
+
+  const sortedReviews = [...filteredReviews].sort((a, b) => {
+    if (sortBy === 'oldest') {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    if (sortBy === 'rating-high') {
+      return b.rating - a.rating;
+    }
+    if (sortBy === 'rating-low') {
+      return a.rating - b.rating;
+    }
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
   if (loading && reviews.length === 0) {
     return (
       <div className="page-container">
@@ -107,21 +139,66 @@ const AdminReviews = () => {
 
       {/* Filtr i statystyki */}
       <div className="filters-section">
-        <div className="form-group">
-          <label htmlFor="lakeFilter">Filtruj po jeziorze:</label>
-          <select
-            id="lakeFilter"
-            value={selectedLake}
-            onChange={(e) => handleLakeFilterChange(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">Wszystkie jeziora</option>
-            {lakes.map(lake => (
-              <option key={lake._id} value={lake._id}>
-                {lake.name} - {lake.location}
-              </option>
-            ))}
-          </select>
+        <div className="filters-grid">
+          <div className="form-group">
+            <label htmlFor="lakeFilter">Filtruj po jeziorze:</label>
+            <select
+              id="lakeFilter"
+              value={selectedLake}
+              onChange={(e) => handleLakeFilterChange(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Wszystkie jeziora</option>
+              {lakes.map(lake => (
+                <option key={lake._id} value={lake._id}>
+                  {lake.name} - {lake.location}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="reviewSearch">Szukaj:</label>
+            <input
+              id="reviewSearch"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Użytkownik, jezioro, komentarz..."
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="minRating">Minimalna ocena:</label>
+            <select
+              id="minRating"
+              value={minRating}
+              onChange={(e) => setMinRating(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">Wszystkie</option>
+              <option value="5">5+</option>
+              <option value="4">4+</option>
+              <option value="3">3+</option>
+              <option value="2">2+</option>
+              <option value="1">1+</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="sortBy">Sortowanie:</label>
+            <select
+              id="sortBy"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="filter-select"
+            >
+              <option value="newest">Najnowsze</option>
+              <option value="oldest">Najstarsze</option>
+              <option value="rating-high">Ocena: najwyższa</option>
+              <option value="rating-low">Ocena: najniższa</option>
+            </select>
+          </div>
+        </div>
+        <div className="filter-actions">
+          <span className="filter-summary">Widocznych: {sortedReviews.length}</span>
         </div>
       </div>
 
@@ -152,13 +229,13 @@ const AdminReviews = () => {
       {error && <div className="error-message">{error}</div>}
 
       {/* Lista opinii */}
-      {reviews.length === 0 ? (
+      {sortedReviews.length === 0 ? (
         <div className="empty-state">
           <p>Brak opinii dla wybranych kryteriów</p>
         </div>
       ) : (
         <div className="reviews-admin-list">
-          {reviews.map((review) => (
+          {sortedReviews.map((review) => (
             <div key={review._id} className="review-admin-card">
               <div className="review-admin-header">
                 <div className="review-admin-user">

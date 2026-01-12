@@ -9,6 +9,8 @@ const ReviewList = ({ lakeId, onReviewAdded }) => {
   const [error, setError] = useState('');
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
+  const [sortBy, setSortBy] = useState('newest');
+  const [minRating, setMinRating] = useState('all');
 
   useEffect(() => {
     fetchReviews();
@@ -28,6 +30,21 @@ const ReviewList = ({ lakeId, onReviewAdded }) => {
       setLoading(false);
     }
   };
+
+  const minValue = minRating === 'all' ? 0 : Number(minRating);
+  const filteredReviews = reviews.filter((review) => review.rating >= minValue);
+  const sortedReviews = [...filteredReviews].sort((a, b) => {
+    if (sortBy === 'oldest') {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    if (sortBy === 'rating-high') {
+      return b.rating - a.rating;
+    }
+    if (sortBy === 'rating-low') {
+      return a.rating - b.rating;
+    }
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
 
   const handleDeleteReview = async (reviewId) => {
     if (!window.confirm('Czy na pewno chcesz usunąć tę opinię?')) {
@@ -90,6 +107,42 @@ const ReviewList = ({ lakeId, onReviewAdded }) => {
         )}
       </div>
 
+      {reviews.length > 0 && (
+        <div className="reviews-controls">
+          <div className="reviews-control-group">
+            <label htmlFor="review-sort">Sortowanie:</label>
+            <select
+              id="review-sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">Najnowsze</option>
+              <option value="oldest">Najstarsze</option>
+              <option value="rating-high">Ocena: najwyższa</option>
+              <option value="rating-low">Ocena: najniższa</option>
+            </select>
+          </div>
+          <div className="reviews-control-group">
+            <label htmlFor="review-min-rating">Minimalna ocena:</label>
+            <select
+              id="review-min-rating"
+              value={minRating}
+              onChange={(e) => setMinRating(e.target.value)}
+            >
+              <option value="all">Wszystkie</option>
+              <option value="5">5+</option>
+              <option value="4">4+</option>
+              <option value="3">3+</option>
+              <option value="2">2+</option>
+              <option value="1">1+</option>
+            </select>
+          </div>
+          <div className="reviews-control-meta">
+            Widocznych: {sortedReviews.length}
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="error-message">{error}</div>
       )}
@@ -100,7 +153,7 @@ const ReviewList = ({ lakeId, onReviewAdded }) => {
         </div>
       ) : (
         <div className="reviews-list">
-          {reviews.map((review) => (
+          {sortedReviews.map((review) => (
             <div key={review._id} className="review-card">
               <div className="review-header">
                 <div className="review-author-info">
@@ -121,7 +174,7 @@ const ReviewList = ({ lakeId, onReviewAdded }) => {
                 <p>{review.comment}</p>
               </div>
 
-              {user && user.userId === review.userId?._id && (
+              {user && (user.id === review.userId?._id || user._id === review.userId?._id) && (
                 <div className="review-actions">
                   <button
                     onClick={() => handleDeleteReview(review._id)}

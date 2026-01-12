@@ -8,6 +8,9 @@ const MyReservations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('all'); // all, upcoming, past
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('date-asc');
 
   useEffect(() => {
     fetchReservations();
@@ -74,6 +77,40 @@ const MyReservations = () => {
     return new Date(date) < today;
   };
 
+  const filteredReservations = reservations.filter((reservation) => {
+    if (statusFilter !== 'all' && reservation.status !== statusFilter) {
+      return false;
+    }
+
+    const search = searchTerm.trim().toLowerCase();
+    if (!search) return true;
+
+    const haystack = [
+      reservation.lakeId?.name,
+      reservation.lakeId?.location,
+      reservation.spotId?.name,
+      reservation.notes
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return haystack.includes(search);
+  });
+
+  const sortedReservations = [...filteredReservations].sort((a, b) => {
+    if (sortBy === 'date-desc') {
+      return new Date(b.date) - new Date(a.date);
+    }
+    if (sortBy === 'created-desc') {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+    if (sortBy === 'created-asc') {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    return new Date(a.date) - new Date(b.date);
+  });
+
   if (loading) {
     return (
       <div className="page-container">
@@ -120,7 +157,49 @@ const MyReservations = () => {
         </button>
       </div>
 
-      {reservations.length === 0 ? (
+      <div className="reservations-tools">
+        <div className="reservations-tool-group">
+          <label htmlFor="reservation-status">Status:</label>
+          <select
+            id="reservation-status"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">Wszystkie</option>
+            <option value="confirmed">Potwierdzone</option>
+            <option value="pending">Oczekujące</option>
+            <option value="cancelled">Anulowane</option>
+          </select>
+        </div>
+        <div className="reservations-tool-group">
+          <label htmlFor="reservation-search">Szukaj:</label>
+          <input
+            id="reservation-search"
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Jezioro, stanowisko, notatki..."
+          />
+        </div>
+        <div className="reservations-tool-group">
+          <label htmlFor="reservation-sort">Sortowanie:</label>
+          <select
+            id="reservation-sort"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="date-asc">Data: rosnąco</option>
+            <option value="date-desc">Data: malejąco</option>
+            <option value="created-desc">Utworzone: najnowsze</option>
+            <option value="created-asc">Utworzone: najstarsze</option>
+          </select>
+        </div>
+        <div className="reservations-tool-meta">
+          Widocznych: {sortedReservations.length}
+        </div>
+      </div>
+
+      {sortedReservations.length === 0 ? (
         <div className="empty-state">
           <h2>Brak rezerwacji</h2>
           <p>
@@ -136,7 +215,7 @@ const MyReservations = () => {
         </div>
       ) : (
         <div className="reservations-list">
-          {reservations.map((reservation) => (
+          {sortedReservations.map((reservation) => (
             <div key={reservation._id} className="reservation-card">
               <div className="reservation-card-header">
                 <div>
