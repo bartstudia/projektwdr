@@ -516,22 +516,28 @@ Notes:
 
 ## E2E tests (Playwright)
 
-1) Seed data:
-   cd server
-   npm run seed
+Testy E2E uzywaja istniejacych danych. Ustaw zmienne srodowiskowe:
+- E2E_USER_EMAIL
+- E2E_USER_PASSWORD
+- E2E_ADMIN_EMAIL
+- E2E_ADMIN_PASSWORD
+- E2E_LAKE_NAME
+- E2E_EMPTY_EMAIL
+- E2E_EMPTY_PASSWORD
+- E2E_EMPTY_LAKE_NAME
 
-2) Start backend and frontend in separate terminals:
+1) Start backend and frontend in separate terminals:
    cd server
    npm run dev
 
    cd client
    npm start
 
-3) Install Playwright browsers:
+2) Install Playwright browsers:
    cd client
    npm run e2e:install
 
-4) Run E2E:
+3) Run E2E:
    cd client
    npm run e2e
 

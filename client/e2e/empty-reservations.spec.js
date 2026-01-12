@@ -1,16 +1,14 @@
 const { test, expect } = require('@playwright/test');
 
-test('new user sees empty reservations state', async ({ page }) => {
-  const timestamp = Date.now();
-  const email = `empty-${timestamp}@test.pl`;
+const emptyEmail = process.env.E2E_EMPTY_EMAIL;
+const emptyPassword = process.env.E2E_EMPTY_PASSWORD;
 
-  await page.goto('/register');
-  await page.getByTestId('register-name').fill('Empty User');
-  await page.getByTestId('register-email').fill(email);
-  await page.getByTestId('register-password').fill('user123');
-  await page.getByTestId('register-confirm').fill('user123');
-  await page.getByTestId('register-submit').click();
-
+test('user sees empty reservations state', async ({ page }) => {
+  test.skip(!emptyEmail || !emptyPassword, 'Set E2E_EMPTY_EMAIL and E2E_EMPTY_PASSWORD');
+  await page.goto('/login');
+  await page.getByTestId('login-email').fill(emptyEmail);
+  await page.getByTestId('login-password').fill(emptyPassword);
+  await page.getByTestId('login-submit').click();
   await page.waitForURL('**/dashboard');
   await page.goto('/my-reservations');
 
