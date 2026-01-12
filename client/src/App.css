@@ -2126,6 +2126,40 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.reservations-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  background: var(--surface);
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.reservations-tool-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.reservations-tool-group input,
+.reservations-tool-group select {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: white;
+}
+
+.reservations-tool-meta {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
 .filter-btn {
   padding: 0.75rem 1.5rem;
   border: 2px solid var(--border-color);
@@ -2285,6 +2319,38 @@ body {
   align-items: center;
   gap: 2rem;
   flex-wrap: wrap;
+}
+
+.reviews-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--primary-light);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.reviews-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.reviews-control-group select {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  background: white;
+}
+
+.reviews-control-meta {
+  font-weight: 600;
+  color: var(--primary-dark);
 }
 
 .average-rating {
@@ -2528,6 +2594,11 @@ body {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+}
+
+.filter-summary {
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 /* Stats Section */
@@ -2928,6 +2999,15 @@ body {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
+  }
+
+  .reviews-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reservations-tools {
+    grid-template-columns: 1fr;
   }
 
   .filter-actions {
