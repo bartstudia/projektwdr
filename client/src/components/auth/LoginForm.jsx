@@ -66,7 +66,6 @@ const LoginForm = () => {
             onChange={handleChange}
             required
             placeholder="Wprowadź swój email"
-            data-testid="login-email"
           />
         </div>
 
@@ -81,16 +80,10 @@ const LoginForm = () => {
             required
             placeholder="Wprowadź hasło"
             minLength="6"
-            data-testid="login-password"
           />
         </div>
 
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={isLoading}
-          data-testid="login-submit"
-        >
+        <button type="submit" className="btn-primary" disabled={isLoading}>
           {isLoading ? 'Logowanie...' : 'Zaloguj się'}
         </button>
       </form>
