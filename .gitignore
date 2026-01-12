@@ -34,5 +34,10 @@ lerna-debug.log*
 # Uploads
 
 
+# E2E
+/client/playwright-report/
+/client/test-results/
+
+
 # OS
 Thumbs.db
