@@ -32,6 +32,7 @@ lerna-debug.log*
 *~
 
 # Uploads
+/server/uploads/
 
 
 # OS
