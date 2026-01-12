@@ -234,6 +234,7 @@ const ReservationPage = () => {
               type="submit"
               className="btn-primary"
               disabled={!selectedDate || submitting || isSpotUnavailable || availabilityLoading}
+              data-testid="reservation-submit"
             >
               {submitting ? 'Tworzenie rezerwacji...' : 'Potwierdź rezerwację'}
             </button>

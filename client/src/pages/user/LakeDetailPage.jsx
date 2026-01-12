@@ -381,6 +381,7 @@ const LakeDetailPage = () => {
                   onClick={handleReserveFirstAvailable}
                   className="btn-primary btn-small"
                   disabled={availableCount === 0}
+                  data-testid="reserve-first-available"
                 >
                   Zarezerwuj pierwsze dostępne
                 </button>

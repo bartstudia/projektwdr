@@ -82,6 +82,7 @@ const ReviewForm = ({ lakeId, onReviewSubmitted }) => {
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}
+            data-testid={`review-star-${star}`}
             className={`star ${star <= (hoveredRating || rating) ? 'filled' : ''} ${
               hoveredRating === star ? 'hovered' : ''
             }`}
@@ -138,6 +139,7 @@ const ReviewForm = ({ lakeId, onReviewSubmitted }) => {
             minLength={10}
             maxLength={1000}
             required
+            data-testid="review-comment"
           />
           <small className="form-hint">
             {comment.length}/1000 znaków (minimum 10)
@@ -167,6 +169,7 @@ const ReviewForm = ({ lakeId, onReviewSubmitted }) => {
             type="submit"
             className="btn-primary"
             disabled={submitting || rating === 0 || comment.trim().length < 10}
+            data-testid="review-submit"
           >
             {submitting ? 'Dodawanie...' : 'Dodaj opinię'}
           </button>

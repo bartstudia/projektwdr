@@ -337,6 +337,7 @@ const MyReservations = () => {
                   <button
                     onClick={() => handleCancelReservation(reservation._id)}
                     className="btn-danger btn-small"
+                    data-testid="reservation-cancel"
                   >
                     Anuluj Rezerwację
                   </button>

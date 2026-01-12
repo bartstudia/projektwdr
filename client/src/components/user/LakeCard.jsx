@@ -60,7 +60,11 @@ const LakeCard = ({ lake, availability, availabilityDate, availabilityLoading })
             )}
           </div>
         )}
-        <Link to={`/lakes/${lake._id}`} className="btn-primary btn-card">
+        <Link
+          to={`/lakes/${lake._id}`}
+          className="btn-primary btn-card"
+          data-testid="lake-details"
+        >
           Zobacz szczegóły
         </Link>
       </div>
