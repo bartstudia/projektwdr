@@ -1,120 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
-const ImageMapEditor = ({
-  lakeImage,
-  onSave,
-  existingSpots = [],
-  lake,
-  highlightedSpotId = null,
-  initialShape = 'circle'
-}) => {
+const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
   const [clickedPoints, setClickedPoints] = useState([]);
-  const [shape, setShape] = useState(initialShape);
+  const [shape, setShape] = useState('circle');
   const [previewCoords, setPreviewCoords] = useState(null);
-  const [hoverPoint, setHoverPoint] = useState(null);
   const imageRef = useRef(null);
-
-  const MIN_SIZE = 8;
-
-  const getBoundingBox = (shape, coords) => {
-    if (!coords || coords.length < 2) {
-      return null;
-    }
-
-    if (shape === 'circle') {
-      const [x, y, radius] = coords;
-      return {
-        minX: x - radius,
-        minY: y - radius,
-        maxX: x + radius,
-        maxY: y + radius
-      };
-    }
-
-    if (shape === 'rect') {
-      const [x1, y1, x2, y2] = coords;
-      return {
-        minX: Math.min(x1, x2),
-        minY: Math.min(y1, y2),
-        maxX: Math.max(x1, x2),
-        maxY: Math.max(y1, y2)
-      };
-    }
-
-    const xs = [];
-    const ys = [];
-    for (let i = 0; i < coords.length; i += 2) {
-      xs.push(coords[i]);
-      ys.push(coords[i + 1]);
-    }
-    return {
-      minX: Math.min(...xs),
-      minY: Math.min(...ys),
-      maxX: Math.max(...xs),
-      maxY: Math.max(...ys)
-    };
-  };
-
-  const isOverlapping = (boxA, boxB) => {
-    if (!boxA || !boxB) return false;
-    return !(
-      boxA.maxX < boxB.minX ||
-      boxA.minX > boxB.maxX ||
-      boxA.maxY < boxB.minY ||
-      boxA.minY > boxB.maxY
-    );
-  };
-
-  const validateMapCoordinates = (mapCoordinates) => {
-    const { shape: targetShape, coords } = mapCoordinates;
-
-    if (targetShape === 'circle') {
-      if (coords[2] < MIN_SIZE) {
-        alert('Okrąg jest zbyt mały. Zwiększ promień.');
-        return false;
-      }
-    } else if (targetShape === 'rect') {
-      const width = Math.abs(coords[2] - coords[0]);
-      const height = Math.abs(coords[3] - coords[1]);
-      if (width < MIN_SIZE || height < MIN_SIZE) {
-        alert('Prostokąt jest zbyt mały. Zwiększ rozmiar.');
-        return false;
-      }
-    } else if (targetShape === 'poly') {
-      const box = getBoundingBox(targetShape, coords);
-      if (box && (box.maxX - box.minX < MIN_SIZE || box.maxY - box.minY < MIN_SIZE)) {
-        alert('Wielokąt jest zbyt mały. Zaznacz większy obszar.');
-        return false;
-      }
-    }
-
-    const newBox = getBoundingBox(targetShape, coords);
-    const hasOverlap = existingSpots.some((spot) => {
-      if (highlightedSpotId && spot._id === highlightedSpotId) return false;
-      const spotBox = getBoundingBox(spot.mapCoordinates.shape, spot.mapCoordinates.coords);
-      return isOverlapping(newBox, spotBox);
-    });
-
-    if (hasOverlap) {
-      return window.confirm('Nowy obszar nakłada się na istniejące stanowisko. Czy chcesz kontynuować?');
-    }
-
-    return true;
-  };
-
-  const handleReset = () => {
-    setClickedPoints([]);
-    setPreviewCoords(null);
-    setHoverPoint(null);
-  };
-
-  useEffect(() => {
-    if (initialShape) {
-      setShape(initialShape);
-      handleReset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialShape]);
 
   const handleImageClick = (e) => {
     if (!imageRef.current) return;
@@ -126,7 +16,6 @@ const ImageMapEditor = ({
     const newPoint = { x, y };
     const updatedPoints = [...clickedPoints, newPoint];
     setClickedPoints(updatedPoints);
-    setHoverPoint(null);
 
     // Auto-complete based on shape
     if (shape === 'circle' && updatedPoints.length === 2) {
@@ -159,22 +48,17 @@ const ImageMapEditor = ({
       setPreviewCoords({ shape: 'circle', x: clickedPoints[0].x, y: clickedPoints[0].y, radius });
     } else if (shape === 'rect' && clickedPoints.length === 1) {
       setPreviewCoords({ shape: 'rect', x1: clickedPoints[0].x, y1: clickedPoints[0].y, x2: x, y2: y });
-    } else if (shape === 'poly') {
-      setHoverPoint({ x, y });
     }
   };
 
   const handleComplete = (mapCoordinates) => {
-    if (!validateMapCoordinates(mapCoordinates)) {
-      return;
-    }
     onSave(mapCoordinates);
     handleReset();
   };
 
-  const handleUndoLastPoint = () => {
-    if (clickedPoints.length === 0) return;
-    setClickedPoints((prev) => prev.slice(0, -1));
+  const handleReset = () => {
+    setClickedPoints([]);
+    setPreviewCoords(null);
   };
 
   const handlePolygonComplete = () => {
@@ -209,11 +93,6 @@ const ImageMapEditor = ({
             {shape === 'poly' && clickedPoints.length >= 3 && (
               <button type="button" onClick={handlePolygonComplete} className="btn-primary btn-small">
                 Zakończ wielokąt
-              </button>
-            )}
-            {shape === 'poly' && (
-              <button type="button" onClick={handleUndoLastPoint} className="btn-secondary btn-small">
-                Cofnij punkt
               </button>
             )}
             <button type="button" onClick={handleReset} className="btn-secondary btn-small">
@@ -253,12 +132,6 @@ const ImageMapEditor = ({
               <span className="legend-color existing-spot-color"></span>
               <span>Istniejące stanowiska ({existingSpots.length})</span>
             </div>
-            {highlightedSpotId && (
-              <div className="legend-item">
-                <span className="legend-color editing-spot-color"></span>
-                <span>Edytowane stanowisko</span>
-              </div>
-            )}
             <div className="legend-item">
               <span className="legend-color new-spot-color"></span>
               <span>Nowe stanowisko (w trakcie tworzenia)</span>
@@ -336,17 +209,6 @@ const ImageMapEditor = ({
                 />
               );
             })}
-            {hoverPoint && clickedPoints.length > 0 && (
-              <line
-                x1={clickedPoints[clickedPoints.length - 1].x}
-                y1={clickedPoints[clickedPoints.length - 1].y}
-                x2={hoverPoint.x}
-                y2={hoverPoint.y}
-                stroke="#90caf9"
-                strokeWidth="2"
-                strokeDasharray="4 6"
-              />
-            )}
           </svg>
         )}
 
@@ -366,9 +228,8 @@ const ImageMapEditor = ({
           >
             {existingSpots.map((spot) => {
               const coords = spot.mapCoordinates.coords;
-              const isHighlighted = highlightedSpotId === spot._id;
-              const fillColor = isHighlighted ? 'rgba(255, 152, 0, 0.25)' : 'rgba(158, 158, 158, 0.3)';
-              const strokeColor = isHighlighted ? '#fb8c00' : '#757575';
+              const fillColor = 'rgba(158, 158, 158, 0.3)'; // Szary półprzezroczysty
+              const strokeColor = '#757575';
 
               if (spot.mapCoordinates.shape === 'circle') {
                 return (

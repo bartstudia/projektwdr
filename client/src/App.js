@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -32,8 +31,7 @@ function App() {
         <div className="App">
           <Navbar />
           <main className="main-content">
-            <ErrorBoundary>
-              <Routes>
+            <Routes>
               {/* Public routes */}
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -160,8 +158,7 @@ function App() {
                   </div>
                 }
               />
-              </Routes>
-            </ErrorBoundary>
+            </Routes>
           </main>
           <Footer />
         </div>
