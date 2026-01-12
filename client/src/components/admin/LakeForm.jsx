@@ -5,7 +5,8 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    location: ''
+    location: '',
+    googleMapsUrl: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -17,7 +18,8 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
       setFormData({
         name: lake.name || '',
         description: lake.description || '',
-        location: lake.location || ''
+        location: lake.location || '',
+        googleMapsUrl: lake.googleMapsUrl || ''
       });
       if (lake.imageUrl) {
         setImagePreview(`http://localhost:5000${lake.imageUrl}`);
@@ -71,7 +73,7 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
       }
 
       // Reset formularza
-      setFormData({ name: '', description: '', location: '' });
+      setFormData({ name: '', description: '', location: '', googleMapsUrl: '' });
       setImageFile(null);
       setImagePreview(null);
 
@@ -131,6 +133,19 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
             rows="5"
             placeholder="Opisz jezioro, jakie ryby można złowić, udogodnienia itp."
           />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="googleMapsUrl">Link do Google Maps:</label>
+          <input
+            type="url"
+            id="googleMapsUrl"
+            name="googleMapsUrl"
+            value={formData.googleMapsUrl}
+            onChange={handleChange}
+            placeholder="https://maps.google.com/..."
+          />
+          <small>Opcjonalne. Dowolny poprawny URL.</small>
         </div>
 
         <div className="form-group">

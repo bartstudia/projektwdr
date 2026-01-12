@@ -106,6 +106,51 @@ const LakeDetailPage = () => {
     return spots.filter(spot => !reservedSpotIds.includes(spot._id)).length;
   };
 
+  const getMapsEmbedUrl = () => {
+    if (!lake || !lake.googleMapsUrl) {
+      return null;
+    }
+
+    const rawUrl = lake.googleMapsUrl;
+
+    if (rawUrl.includes('google.com/maps/embed') || rawUrl.includes('output=embed')) {
+      return rawUrl;
+    }
+
+    const coordsMatch = rawUrl.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+    if (coordsMatch) {
+      return `https://www.google.com/maps?q=${coordsMatch[1]},${coordsMatch[2]}&output=embed`;
+    }
+
+    try {
+      const url = new URL(rawUrl);
+      const query = url.searchParams.get('q') || url.searchParams.get('query');
+      if (query) {
+        return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+      }
+
+      const searchPathMatch = url.pathname.match(/\/maps\/search\/([^/]+)/);
+      if (searchPathMatch) {
+        const searchValue = decodeURIComponent(searchPathMatch[1]).replace(/\+/g, ' ');
+        return `https://www.google.com/maps?q=${encodeURIComponent(searchValue)}&output=embed`;
+      }
+
+      const placePathMatch = url.pathname.match(/\/maps\/place\/([^/]+)/);
+      if (placePathMatch) {
+        const placeValue = decodeURIComponent(placePathMatch[1]).replace(/\+/g, ' ');
+        return `https://www.google.com/maps?q=${encodeURIComponent(placeValue)}&output=embed`;
+      }
+    } catch (error) {
+      return null;
+    }
+
+    if (lake.location) {
+      return `https://www.google.com/maps?q=${encodeURIComponent(lake.location)}&output=embed`;
+    }
+
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -138,6 +183,8 @@ const LakeDetailPage = () => {
     );
   }
 
+  const mapsEmbedUrl = getMapsEmbedUrl();
+
   return (
     <div className="page-container">
       <button onClick={() => navigate('/lakes')} className="btn-back">
@@ -151,6 +198,31 @@ const LakeDetailPage = () => {
           {lake.location}
         </p>
       </div>
+
+      {mapsEmbedUrl && (
+        <div className="lake-maps-embed-section">
+          <div className="lake-maps-embed-header">
+            <h2 className="lake-maps-embed-title">Mapa dojazdu</h2>
+            <a
+              className="lake-maps-embed-link"
+              href={lake.googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Otworz w Google Maps
+            </a>
+          </div>
+          <div className="lake-detail-maps-embed">
+            <iframe
+              title={`Mapa Google - ${lake.name}`}
+              src={mapsEmbedUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
 
       {/* NOWE: Selektor daty */}
       <div className="date-selector-section">
@@ -278,3 +350,4 @@ const LakeDetailPage = () => {
 };
 
 export default LakeDetailPage;
+
