@@ -516,8 +516,6 @@ Notes:
 
 ## E2E tests (Playwright)
 
-Wymagane: ustaw MONGODB_URI_E2E w server/.env (osobna baza testowa).
-
 1) Seed data:
    cd server
    npm run seed
