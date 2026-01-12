@@ -353,6 +353,87 @@ exports.getReservedSpotsForDate = async (req, res) => {
   }
 };
 
+// @desc    Pobierz dostępność jeziora w zakresie dat
+// @route   GET /api/reservations/lake/:lakeId/availability?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+// @access  Public
+exports.getLakeAvailability = async (req, res) => {
+  try {
+    const { lakeId } = req.params;
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parametry startDate i endDate są wymagane'
+      });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      return res.status(400).json({
+        success: false,
+        message: 'Data rozpoczęcia nie może być późniejsza niż data zakończenia'
+      });
+    }
+
+    const startOfDay = new Date(start);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(end);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const totalSpots = await FishingSpot.countDocuments({ lakeId, isActive: true });
+
+    if (totalSpots === 0) {
+      return res.status(200).json({
+        success: true,
+        totalSpots: 0,
+        availability: {}
+      });
+    }
+
+    const reservations = await Reservation.aggregate([
+      {
+        $match: {
+          lakeId: new mongoose.Types.ObjectId(lakeId),
+          date: { $gte: startOfDay, $lte: endOfDay },
+          status: { $ne: 'cancelled' }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: '%Y-%m-%d', date: '$date' }
+          },
+          reservedCount: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const availability = reservations.reduce((acc, entry) => {
+      const reservedCount = entry.reservedCount || 0;
+      acc[entry._id] = {
+        reservedCount,
+        availableCount: Math.max(totalSpots - reservedCount, 0)
+      };
+      return acc;
+    }, {});
+
+    res.status(200).json({
+      success: true,
+      totalSpots,
+      availability
+    });
+  } catch (error) {
+    console.error('Błąd podczas pobierania dostępności jeziora:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Wystąpił błąd podczas pobierania dostępności'
+    });
+  }
+};
+
 // @desc    Pobierz wszystkie rezerwacje (ADMIN)
 // @route   GET /api/reservations/admin/all
 // @access  Private/Admin

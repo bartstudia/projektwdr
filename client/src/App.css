@@ -1261,6 +1261,25 @@ body {
   flex-wrap: wrap;
 }
 
+.availability-calendar {
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  min-width: 320px;
+}
+
+.availability-calendar .calendar-header h3 {
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.availability-calendar .calendar-hint {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
 .availability-actions {
   display: flex;
   justify-content: flex-end;
@@ -2974,6 +2993,10 @@ body {
   .availability-filters {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .availability-calendar {
+    width: 100%;
   }
 
   .spots-list {

@@ -6,6 +6,8 @@ import ImageMap from '../../components/user/ImageMap';
 import ReviewList from '../../components/user/ReviewList';
 import ReviewForm from '../../components/user/ReviewForm';
 import { useAuth } from '../../context/AuthContext';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 const LakeDetailPage = () => {
   const { id } = useParams();
@@ -21,6 +23,9 @@ const LakeDetailPage = () => {
   // Nowe: wybór daty i dostępność
   const [selectedDate, setSelectedDate] = useState('');
   const [reservedSpotIds, setReservedSpotIds] = useState([]);
+  const [availabilityByDate, setAvailabilityByDate] = useState({});
+  const [availabilityTotalSpots, setAvailabilityTotalSpots] = useState(0);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   const buildEmbedUrl = (target) => {
     if (!target) return null;
@@ -63,6 +68,12 @@ const LakeDetailPage = () => {
     fetchLakeDetails();
   }, [id]);
 
+  useEffect(() => {
+    if (id) {
+      fetchAvailabilityCalendar();
+    }
+  }, [id]);
+
   // Pobierz dostępność stanowisk gdy zmieni się data
   useEffect(() => {
     if (selectedDate && id) {
@@ -100,9 +111,38 @@ const LakeDetailPage = () => {
     }
   };
 
+  const fetchAvailabilityCalendar = async () => {
+    try {
+      setAvailabilityLoading(true);
+      const today = new Date();
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 2);
+
+      const data = await reservationService.getLakeAvailability(
+        id,
+        today.toISOString().split('T')[0],
+        endDate.toISOString().split('T')[0]
+      );
+
+      setAvailabilityByDate(data.availability || {});
+      setAvailabilityTotalSpots(data.totalSpots || 0);
+    } catch (err) {
+      console.error('Błąd podczas pobierania kalendarza dostępności:', err);
+    } finally {
+      setAvailabilityLoading(false);
+    }
+  };
+
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
     setSelectedSpot(null); // Reset wybranego stanowiska
+  };
+
+  const handleCalendarChange = (date) => {
+    if (!date) return;
+    const dateStr = new Date(date).toISOString().split('T')[0];
+    setSelectedDate(dateStr);
+    setSelectedSpot(null);
   };
 
   const handleSpotClick = (spot) => {
@@ -201,6 +241,8 @@ const LakeDetailPage = () => {
   const embedUrl = buildEmbedUrl(mapTarget);
   const mapLink = buildMapLink(mapTarget);
   const availableCount = getAvailableSpotsCount();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   return (
     <div className="page-container">
@@ -236,10 +278,78 @@ const LakeDetailPage = () => {
               className="date-input-large"
             />
           </div>
-            {selectedDate && (
-              <div className="availability-info">
-                <div className="availability-stat">
-                  <span className="stat-label">Dostępne stanowiska:</span>
+          <div className="availability-calendar">
+            <div className="calendar-header">
+              <h3>Kalendarz dostępności</h3>
+              <p className="calendar-hint">Kliknij dzień, aby wybrać termin</p>
+            </div>
+            {availabilityLoading ? (
+              <div className="calendar-loading">
+                <div className="loading-spinner">Ładowanie kalendarza...</div>
+              </div>
+            ) : (
+              <Calendar
+                onChange={handleCalendarChange}
+                value={selectedDate ? new Date(selectedDate) : null}
+                tileDisabled={({ date, view }) => {
+                  if (view !== 'month') return false;
+                  if (date < today) return true;
+                  const key = date.toISOString().split('T')[0];
+                  if (!availabilityByDate[key]) return false;
+                  return availabilityByDate[key].availableCount === 0;
+                }}
+                tileClassName={({ date, view }) => {
+                  if (view !== 'month') return null;
+                  const classes = [];
+                  if (date.getTime() === today.getTime()) {
+                    classes.push('today-tile');
+                  }
+                  const key = date.toISOString().split('T')[0];
+                  const info = availabilityByDate[key];
+                  if (availabilityTotalSpots > 0 && info && info.availableCount === 0) {
+                    classes.push('reserved-tile');
+                  }
+                  if (selectedDate) {
+                    const selected = new Date(selectedDate);
+                    if (
+                      date.getFullYear() === selected.getFullYear() &&
+                      date.getMonth() === selected.getMonth() &&
+                      date.getDate() === selected.getDate()
+                    ) {
+                      classes.push('selected-tile');
+                    }
+                  }
+                  return classes.join(' ');
+                }}
+                minDate={today}
+                maxDate={(() => {
+                  const maxDate = new Date();
+                  maxDate.setMonth(maxDate.getMonth() + 2);
+                  return maxDate;
+                })()}
+                locale="pl-PL"
+                className="custom-calendar"
+              />
+            )}
+            <div className="calendar-legend">
+              <div className="legend-item">
+                <span className="legend-box available"></span>
+                <span>Dostępne</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-box reserved"></span>
+                <span>Brak miejsc</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-box selected"></span>
+                <span>Wybrane</span>
+              </div>
+            </div>
+          </div>
+          {selectedDate && (
+            <div className="availability-info">
+              <div className="availability-stat">
+                <span className="stat-label">Dostępne stanowiska:</span>
                   <span className="stat-value available">{availableCount} / {spots.length}</span>
                 </div>
                 <div className="availability-stat">
