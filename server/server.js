@@ -39,6 +39,7 @@ app.use('/api/lakes', require('./routes/lakeRoutes'));
 app.use('/api/spots', require('./routes/spotRoutes'));
 app.use('/api/reservations', require('./routes/reservationRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/admin', require('./routes/adminStatsRoutes'));
 
 // Obsługa błędów 404
 app.use((req, res) => {

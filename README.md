@@ -499,3 +499,47 @@ ISC
 **Jeśli coś nie działa - sprawdź FAQ lub otwórz Issue na GitHubie!** 😊
 
 **Powodzenia z wędkowaniem!** 🎣
+
+
+## API Update (admin/stats + availability)
+
+Additional endpoints now available:
+- GET /api/admin/stats
+- GET /api/reservations/lake/:lakeId/availability?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+- GET /api/reservations/lake/:lakeId/date/:date
+- GET /api/reservations/admin/all
+
+Notes:
+- Rezerwacje maja statusy: pending, confirmed, cancelled.
+- Opinie nie wymagaja moderacji.
+
+
+## E2E tests (Playwright)
+
+Testy E2E uzywaja istniejacych danych. Ustaw zmienne srodowiskowe:
+- E2E_USER_EMAIL
+- E2E_USER_PASSWORD
+- E2E_ADMIN_EMAIL
+- E2E_ADMIN_PASSWORD
+- E2E_LAKE_NAME
+- E2E_EMPTY_EMAIL
+- E2E_EMPTY_PASSWORD
+- E2E_EMPTY_LAKE_NAME
+
+1) Start backend and frontend in separate terminals:
+   cd server
+   npm run dev
+
+   cd client
+   npm start
+
+2) Install Playwright browsers:
+   cd client
+   npm run e2e:install
+
+3) Run E2E:
+   cd client
+   npm run e2e
+
+## Minimal error monitoring
+- UI errors are captured by an ErrorBoundary and logged to the console.

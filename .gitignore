@@ -32,6 +32,11 @@ lerna-debug.log*
 *~
 
 # Uploads
+/server/uploads/
+
+# E2E
+/client/playwright-report/
+/client/test-results/
 
 
 # OS
