@@ -326,8 +326,9 @@ const LakeDetailPage = () => {
                   const key = date.toISOString().split('T')[0];
                   const info = availabilityByDate[key];
                   if (!info) return null;
+                  const tooltip = `Dostępne: ${info.availableCount}/${availabilityTotalSpots}`;
                   return (
-                    <span className="calendar-availability">
+                    <span className="calendar-availability" title={tooltip}>
                       {info.availableCount}/{availabilityTotalSpots}
                     </span>
                   );
@@ -356,6 +357,11 @@ const LakeDetailPage = () => {
                 <span>Wybrane</span>
               </div>
             </div>
+            {availabilityTotalSpots === 0 && (
+              <div className="calendar-empty-note">
+                Brak aktywnych stanowisk dla tego jeziora.
+              </div>
+            )}
           </div>
           {selectedDate && (
             <div className="availability-info">
