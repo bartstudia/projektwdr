@@ -14,9 +14,13 @@ const run = async () => {
     process.exit(1);
   }
 
-  const uri = process.env.MONGODB_URI;
+  const uri = process.env.MONGODB_URI_E2E;
   if (!uri) {
-    console.error('MONGODB_URI is required.');
+    console.error('MONGODB_URI_E2E is required for seed.');
+    process.exit(1);
+  }
+  if (process.env.MONGODB_URI && process.env.MONGODB_URI === uri) {
+    console.error('MONGODB_URI_E2E must be different from MONGODB_URI.');
     process.exit(1);
   }
 
