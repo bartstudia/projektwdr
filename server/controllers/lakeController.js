@@ -3,6 +3,85 @@ const FishingSpot = require('../models/FishingSpot');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
+const https = require('https');
+
+const MAX_REDIRECTS = 5;
+
+const followRedirects = (url, redirectCount = 0) => new Promise((resolve) => {
+  if (redirectCount >= MAX_REDIRECTS) {
+    resolve(url);
+    return;
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch (error) {
+    resolve(url);
+    return;
+  }
+
+  const client = parsedUrl.protocol === 'https:' ? https : http;
+  const request = client.request(
+    {
+      method: 'GET',
+      hostname: parsedUrl.hostname,
+      path: parsedUrl.pathname + parsedUrl.search,
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
+      }
+    },
+    (response) => {
+      const statusCode = response.statusCode || 0;
+      const location = response.headers.location;
+      response.resume();
+
+      if (statusCode >= 300 && statusCode < 400 && location) {
+        const nextUrl = new URL(location, url).toString();
+        resolve(followRedirects(nextUrl, redirectCount + 1));
+        return;
+      }
+
+      resolve(url);
+    }
+  );
+
+  request.on('error', () => resolve(url));
+  request.end();
+});
+
+const unwrapGoogleConsentUrl = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    if (!parsedUrl.hostname.startsWith('consent.google.')) {
+      return url;
+    }
+
+    const continueParam = parsedUrl.searchParams.get('continue');
+    if (!continueParam) {
+      return url;
+    }
+
+    return decodeURIComponent(continueParam);
+  } catch (error) {
+    return url;
+  }
+};
+
+const resolveGoogleMapsUrl = async (rawUrl) => {
+  if (!rawUrl) {
+    return null;
+  }
+
+  const trimmed = rawUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const resolved = await followRedirects(trimmed);
+  return unwrapGoogleConsentUrl(resolved);
+};
 
 // @desc    Pobierz wszystkie jeziora
 // @route   GET /api/lakes
@@ -61,7 +140,7 @@ exports.getLakeById = async (req, res) => {
 // @access  Private (Admin)
 exports.createLake = async (req, res) => {
   try {
-    const { name, description, location } = req.body;
+    const { name, description, location, googleMapsUrl } = req.body;
 
     // Walidacja
     if (!name || !description || !location) {
@@ -79,10 +158,13 @@ exports.createLake = async (req, res) => {
     }
 
     // Utwórz jezioro
+    const resolvedGoogleMapsUrl = await resolveGoogleMapsUrl(googleMapsUrl);
+
     const lake = await Lake.create({
       name,
       description,
       location,
+      googleMapsUrl: resolvedGoogleMapsUrl,
       createdBy: req.userId
     });
 
@@ -113,7 +195,7 @@ exports.createLake = async (req, res) => {
 // @access  Private (Admin)
 exports.updateLake = async (req, res) => {
   try {
-    const { name, description, location } = req.body;
+    const { name, description, location, googleMapsUrl } = req.body;
 
     const lake = await Lake.findById(req.params.id);
 
@@ -137,6 +219,10 @@ exports.updateLake = async (req, res) => {
     if (name) lake.name = name;
     if (description) lake.description = description;
     if (location) lake.location = location;
+    if (googleMapsUrl !== undefined) {
+      const resolvedGoogleMapsUrl = await resolveGoogleMapsUrl(googleMapsUrl);
+      lake.googleMapsUrl = resolvedGoogleMapsUrl;
+    }
 
     await lake.save();
 

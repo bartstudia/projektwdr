@@ -30,6 +30,12 @@ const LakeSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  googleMapsUrl: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Link do Google Maps moze miec maksymalnie 500 znakow'],
+    default: null
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
