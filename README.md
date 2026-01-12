@@ -512,3 +512,28 @@ Additional endpoints now available:
 Notes:
 - Rezerwacje maja statusy: pending, confirmed, cancelled.
 - Opinie nie wymagaja moderacji.
+
+
+## E2E tests (Playwright)
+
+1) Seed data:
+   cd server
+   npm run seed
+
+2) Start backend and frontend in separate terminals:
+   cd server
+   npm run dev
+
+   cd client
+   npm start
+
+3) Install Playwright browsers:
+   cd client
+   npm run e2e:install
+
+4) Run E2E:
+   cd client
+   npm run e2e
+
+## Minimal error monitoring
+- UI errors are captured by an ErrorBoundary and logged to the console.
