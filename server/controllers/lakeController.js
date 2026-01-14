@@ -61,7 +61,16 @@ exports.getLakeById = async (req, res) => {
 // @access  Private (Admin)
 exports.createLake = async (req, res) => {
   try {
-    const { name, description, location } = req.body;
+    const {
+      name,
+      description,
+      location,
+      mapIframe,
+      rules,
+      fees,
+      contactInfo,
+      isActive
+    } = req.body;
 
     // Walidacja
     if (!name || !description || !location) {
@@ -83,6 +92,11 @@ exports.createLake = async (req, res) => {
       name,
       description,
       location,
+      mapIframe: mapIframe || null,
+      rules: rules || null,
+      fees: fees || null,
+      contactInfo: contactInfo || null,
+      isActive: isActive !== undefined ? isActive : true,
       createdBy: req.userId
     });
 
@@ -113,7 +127,18 @@ exports.createLake = async (req, res) => {
 // @access  Private (Admin)
 exports.updateLake = async (req, res) => {
   try {
-    const { name, description, location } = req.body;
+    console.log('Update lake req.body:', req.body);
+
+    const {
+      name,
+      description,
+      location,
+      mapIframe,
+      rules,
+      fees,
+      contactInfo,
+      isActive
+    } = req.body;
 
     const lake = await Lake.findById(req.params.id);
 
@@ -137,8 +162,15 @@ exports.updateLake = async (req, res) => {
     if (name) lake.name = name;
     if (description) lake.description = description;
     if (location) lake.location = location;
+    if (mapIframe !== undefined) lake.mapIframe = mapIframe || null;
+    if (rules !== undefined) lake.rules = rules || null;
+    if (fees !== undefined) lake.fees = fees || null;
+    if (contactInfo !== undefined) lake.contactInfo = contactInfo || null;
+    if (isActive !== undefined) lake.isActive = isActive;
 
+    console.log('Lake before save - mapIframe:', lake.mapIframe);
     await lake.save();
+    console.log('Lake saved successfully');
 
     res.json({
       success: true,

@@ -23,6 +23,10 @@ const LakeDetailPage = () => {
   // Nowe: wybór daty i dostępność
   const [selectedDate, setSelectedDate] = useState('');
   const [reservedSpotIds, setReservedSpotIds] = useState([]);
+  const [availabilityByDate, setAvailabilityByDate] = useState({});
+  const [availabilityTotalSpots, setAvailabilityTotalSpots] = useState(0);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+
 
   useEffect(() => {
     fetchLakeDetails();
@@ -140,6 +144,10 @@ const LakeDetailPage = () => {
     );
   }
 
+  const availableCount = getAvailableSpotsCount();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
     <div className="page-container">
       <button onClick={() => navigate('/lakes')} className="btn-back">
@@ -194,6 +202,39 @@ const LakeDetailPage = () => {
           <h2>Opis jeziora</h2>
           <p>{lake.description}</p>
         </div>
+
+        {(lake.rules || lake.fees || lake.contactInfo) && (
+          <div className="lake-extra-info">
+            {lake.rules && (
+              <div className="lake-info-section">
+                <h3>Regulamin</h3>
+                <p>{lake.rules}</p>
+              </div>
+            )}
+            {lake.fees && (
+              <div className="lake-info-section">
+                <h3>Opłaty</h3>
+                <p>{lake.fees}</p>
+              </div>
+            )}
+            {lake.contactInfo && (
+              <div className="lake-info-section">
+                <h3>Kontakt</h3>
+                <p>{lake.contactInfo}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {lake.mapIframe && (
+          <div className="lake-location-section">
+            <h2>Mapa dojazdowa</h2>
+            <div
+              className="map-embed"
+              dangerouslySetInnerHTML={{ __html: lake.mapIframe }}
+            />
+          </div>
+        )}
 
         {lake.imageUrl && spots.length > 0 && (
           <div className="lake-map-section">

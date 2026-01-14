@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const LakeCard = ({ lake }) => {
+const LakeCard = ({ lake, availability, availabilityDate, availabilityLoading }) => {
   return (
     <div className="lake-card">
       {lake.imageUrl && (
@@ -23,7 +23,29 @@ const LakeCard = ({ lake }) => {
             ? `${lake.description.substring(0, 150)}...`
             : lake.description}
         </p>
-        <Link to={`/lakes/${lake._id}`} className="btn-primary btn-card">
+        {availabilityDate && (
+          <div className="lake-availability">
+            <span className="availability-label">Dostepnosc:</span>
+            {availabilityLoading && !availability ? (
+              <span className="availability-count pending">Sprawdzanie...</span>
+            ) : availability ? (
+              availability.totalSpots === 0 ? (
+                <span className="availability-count none">Brak stanowisk</span>
+              ) : (
+                <span className={`availability-count ${availability.availableCount > 0 ? 'available' : 'unavailable'}`}>
+                  {availability.availableCount} / {availability.totalSpots}
+                </span>
+              )
+            ) : (
+              <span className="availability-count pending">Brak danych</span>
+            )}
+          </div>
+        )}
+        <Link
+          to={`/lakes/${lake._id}`}
+          className="btn-primary btn-card"
+          data-testid="lake-details"
+        >
           Zobacz szczegóły
         </Link>
       </div>
