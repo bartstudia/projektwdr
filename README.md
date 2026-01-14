@@ -369,133 +369,64 @@ Po zalogowaniu jako admin:
 
 ```
 projektwdr/
-├── client/                 # Frontend React
-│   ├── public/
-│   ├── src/
-│   │   ├── components/    # Komponenty React
-│   │   │   ├── auth/      # Logowanie, Rejestracja
-│   │   │   ├── admin/     # Panel admina
-│   │   │   ├── user/      # Panel użytkownika
-│   │   │   └── common/    # Navbar, ProtectedRoute
-│   │   ├── pages/         # Strony aplikacji
-│   │   ├── context/       # AuthContext (Context API)
-│   │   ├── services/      # API services (axios)
-│   │   └── App.js
-│   ├── .env               # Konfiguracja frontend
-│   └── package.json
-│
-├── server/                # Backend Node.js + Express
-│   ├── models/           # Modele Mongoose
-│   │   ├── User.js
-│   │   ├── Lake.js
-│   │   ├── FishingSpot.js
-│   │   ├── Reservation.js
-│   │   └── Review.js
-│   ├── controllers/      # Logika biznesowa
-│   ├── routes/           # API endpoints
-│   ├── middleware/       # Auth, upload, etc.
-│   ├── config/           # Konfiguracja DB
-│   ├── uploads/          # Przechowywanie obrazów
-│   ├── .env              # Konfiguracja backend (MONGODB_URI!)
-│   ├── server.js         # Entry point
-│   └── package.json
-│
-├── .gitignore
-└── README.md             # Ten plik!
+  client/                 # Frontend React
+    public/
+    src/
+      components/         # Komponenty UI
+        auth/             # Logowanie i rejestracja
+        admin/            # Panel admina
+        user/             # Panel uzytkownika
+        common/           # Navbar, ProtectedRoute, itp.
+      pages/              # Strony aplikacji
+      context/            # AuthContext
+      services/           # Warstwa API
+    .env
+    package.json
+
+  server/                 # Backend Node.js + Express
+    config/               # Konfiguracja DB
+    controllers/          # Logika biznesowa
+    middleware/           # Auth, upload, itp.
+    models/               # Mongoose models
+    routes/               # API endpoints
+    uploads/              # Pliki uploadowane
+    .env
+    server.js             # Entry point
+    package.json
 ```
 
----
+## API
 
-# 🔒 Bezpieczeństwo
+Pelny opis endpointow znajdziesz w `docs/API.md`.
 
-## W Produkcji MUSISZ zmienić:
+## Bezpieczenstwo
 
-1. **JWT_SECRET** w `server/.env` - użyj silnego, losowego klucza:
-   ```env
-   JWT_SECRET=super-tajny-losowy-klucz-xyz-12345-abcdef
-   ```
+W produkcji koniecznie:
+1. Ustaw silny `JWT_SECRET`.
+2. Ogranicz IP w MongoDB Atlas.
+3. Wymuszaj silne hasla i bezpieczne przechowywanie `.env`.
 
-2. **MongoDB IP Whitelist** - zamiast `0.0.0.0/0` dodaj tylko IP swojego serwera
+## Deployment
 
-3. **Hasła** - używaj silnych haseł (min 12 znaków, duże/małe litery, cyfry, znaki specjalne)
+### Backend
+- Railway
+- Render
+- Heroku
 
----
+### Frontend
+- Vercel
+- Netlify
 
-# 📝 API Endpoints
+### Database
+- MongoDB Atlas
 
-## Autentykacja
-- `POST /api/auth/register` - Rejestracja
-- `POST /api/auth/login` - Logowanie
-- `GET /api/auth/me` - Pobierz dane zalogowanego użytkownika
+## Roadmap
 
-## Jeziora
-- `GET /api/lakes` - Lista wszystkich jezior (public)
-- `GET /api/lakes/:id` - Pojedyncze jezioro ze stanowiskami (public)
-- `POST /api/lakes` - Dodaj jezioro (admin)
-- `PUT /api/lakes/:id` - Edytuj jezioro (admin)
-- `DELETE /api/lakes/:id` - Usuń jezioro (admin)
-- `POST /api/lakes/:id/image` - Upload obrazu (admin)
-
-## Stanowiska
-- `GET /api/spots/lake/:lakeId` - Stanowiska dla jeziora (public)
-- `GET /api/spots/:id` - Pojedyncze stanowisko (public)
-- `POST /api/spots` - Dodaj stanowisko (admin)
-- `PUT /api/spots/:id` - Edytuj stanowisko (admin)
-- `DELETE /api/spots/:id` - Usuń stanowisko (admin)
-
-## Rezerwacje (w budowie)
-- `GET /api/reservations` - Moje rezerwacje
-- `POST /api/reservations` - Utwórz rezerwację
-- `DELETE /api/reservations/:id` - Anuluj rezerwację
-
-## Opinie (w budowie)
-- `GET /api/reviews/lake/:lakeId` - Opinie o jeziorze
-- `POST /api/reviews` - Dodaj opinię
-- `DELETE /api/reviews/:id` - Usuń opinię
-
----
-
-# 🚀 Deployment (Produkcja)
-
-Aplikację możesz wdrożyć na:
-
-### Backend:
-- **Railway** (polecane, darmowe) - https://railway.app
-- **Render** - https://render.com
-- **Heroku** - https://heroku.com
-
-### Frontend:
-- **Vercel** (polecane) - https://vercel.com
-- **Netlify** - https://netlify.com
-
-### Database:
-- **MongoDB Atlas** - już używasz! Pozostaw go w produkcji.
-
----
-
-# 🤝 Autor
-
-Projekt stworzony przy użyciu Claude Code.
-
-## Licencja
-
-ISC
-
----
-
-# 💡 Roadmap (Co dalej?)
-
-- [ ] Panel użytkownika - przeglądanie jezior
-- [ ] Edytor map - klikanie na obraz jeziora (admin)
-- [ ] System rezerwacji z kalendarzem
-- [ ] System opinii
-- [ ] Filtrowanie jezior po lokalizacji
-- [ ] Powiadomienia email o rezerwacjach
-- [ ] Płatności online (Stripe/PayPal)
-- [ ] Aplikacja mobilna (React Native)
-
----
-
-**Jeśli coś nie działa - sprawdź FAQ lub otwórz Issue na GitHubie!** 😊
-
-**Powodzenia z wędkowaniem!** 🎣
+- Panel uzytkownika - przegladanie jezior
+- Edytor map - klikanie na obraz jeziora (admin)
+- System rezerwacji z kalendarzem
+- System opinii
+- Filtrowanie jezior po lokalizacji
+- Powiadomienia email o rezerwacjach
+- Platnosci online (Stripe/PayPal)
+- Aplikacja mobilna (React Native)
