@@ -150,5 +150,4 @@ W produkcji koniecznie:
 - System opinii
 - Filtrowanie jezior po lokalizacji
 - Powiadomienia email o rezerwacjach
-- Platnosci online (Stripe/PayPal)
 - Aplikacja mobilna (React Native)
