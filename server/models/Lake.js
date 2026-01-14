@@ -34,16 +34,9 @@ const LakeSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  gpsLink: {
+  mapIframe: {
     type: String,
-    default: null
-  },
-  latitude: {
-    type: Number,
-    default: null
-  },
-  longitude: {
-    type: Number,
+    maxlength: [5000, 'Kod iframe może mieć maksymalnie 5000 znaków'],
     default: null
   },
   rules: {

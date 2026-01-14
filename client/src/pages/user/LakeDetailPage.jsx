@@ -27,42 +27,6 @@ const LakeDetailPage = () => {
   const [availabilityTotalSpots, setAvailabilityTotalSpots] = useState(0);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
-  const buildEmbedUrl = (target) => {
-    if (!target) return null;
-    const { latitude, longitude, gpsLink } = target;
-
-    if (
-      latitude !== null &&
-      latitude !== undefined &&
-      latitude !== '' &&
-      longitude !== null &&
-      longitude !== undefined &&
-      longitude !== ''
-    ) {
-      return `https://www.google.com/maps?q=${latitude},${longitude}&output=embed`;
-    }
-
-    return gpsLink || null;
-  };
-
-  const buildMapLink = (target) => {
-    if (!target) return null;
-    const { latitude, longitude, gpsLink } = target;
-
-    if (gpsLink) return gpsLink;
-    if (
-      latitude !== null &&
-      latitude !== undefined &&
-      latitude !== '' &&
-      longitude !== null &&
-      longitude !== undefined &&
-      longitude !== ''
-    ) {
-      return `https://www.google.com/maps?q=${latitude},${longitude}`;
-    }
-
-    return null;
-  };
 
   useEffect(() => {
     fetchLakeDetails();
@@ -231,15 +195,6 @@ const LakeDetailPage = () => {
     );
   }
 
-  const spotHasCoords = selectedSpot &&
-    selectedSpot.latitude !== null &&
-    selectedSpot.latitude !== undefined &&
-    selectedSpot.longitude !== null &&
-    selectedSpot.longitude !== undefined;
-  const hasSpotLocation = selectedSpot && (selectedSpot.gpsLink || spotHasCoords);
-  const mapTarget = hasSpotLocation ? selectedSpot : lake;
-  const embedUrl = buildEmbedUrl(mapTarget);
-  const mapLink = buildMapLink(mapTarget);
   const availableCount = getAvailableSpotsCount();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -427,33 +382,13 @@ const LakeDetailPage = () => {
           </div>
         )}
 
-        {embedUrl && (
+        {lake.mapIframe && (
           <div className="lake-location-section">
-            <h2>Mapa lokalizacji</h2>
-            <p>
-              {selectedSpot ? `Stanowisko: ${selectedSpot.name}` : 'Lokalizacja jeziora'}
-            </p>
-            <div className="map-embed">
-              <iframe
-                title="Mapa lokalizacji"
-                src={embedUrl}
-                width="100%"
-                height="360"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-              />
-            </div>
-            {mapLink && (
-              <a
-                href={mapLink}
-                target="_blank"
-                rel="noreferrer"
-                className="map-link"
-              >
-                Otwórz w Google Maps
-              </a>
-            )}
+            <h2>Mapa dojazdowa</h2>
+            <div
+              className="map-embed"
+              dangerouslySetInnerHTML={{ __html: lake.mapIframe }}
+            />
           </div>
         )}
 

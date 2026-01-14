@@ -65,9 +65,7 @@ exports.createLake = async (req, res) => {
       name,
       description,
       location,
-      gpsLink,
-      latitude,
-      longitude,
+      mapIframe,
       rules,
       fees,
       contactInfo,
@@ -94,9 +92,7 @@ exports.createLake = async (req, res) => {
       name,
       description,
       location,
-      gpsLink: gpsLink || null,
-      latitude: latitude !== undefined ? latitude : null,
-      longitude: longitude !== undefined ? longitude : null,
+      mapIframe: mapIframe || null,
       rules: rules || null,
       fees: fees || null,
       contactInfo: contactInfo || null,
@@ -131,13 +127,13 @@ exports.createLake = async (req, res) => {
 // @access  Private (Admin)
 exports.updateLake = async (req, res) => {
   try {
+    console.log('Update lake req.body:', req.body);
+
     const {
       name,
       description,
       location,
-      gpsLink,
-      latitude,
-      longitude,
+      mapIframe,
       rules,
       fees,
       contactInfo,
@@ -166,15 +162,15 @@ exports.updateLake = async (req, res) => {
     if (name) lake.name = name;
     if (description) lake.description = description;
     if (location) lake.location = location;
-    if (gpsLink !== undefined) lake.gpsLink = gpsLink || null;
-    if (latitude !== undefined) lake.latitude = latitude;
-    if (longitude !== undefined) lake.longitude = longitude;
+    if (mapIframe !== undefined) lake.mapIframe = mapIframe || null;
     if (rules !== undefined) lake.rules = rules || null;
     if (fees !== undefined) lake.fees = fees || null;
     if (contactInfo !== undefined) lake.contactInfo = contactInfo || null;
     if (isActive !== undefined) lake.isActive = isActive;
 
+    console.log('Lake before save - mapIframe:', lake.mapIframe);
     await lake.save();
+    console.log('Lake saved successfully');
 
     res.json({
       success: true,

@@ -1154,6 +1154,13 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   border: 2px solid var(--border);
+  width: 100%;
+}
+
+.map-embed iframe {
+  width: 100% !important;
+  height: 400px !important;
+  display: block;
 }
 
 .map-link {

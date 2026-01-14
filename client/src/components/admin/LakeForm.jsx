@@ -6,9 +6,7 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
     name: '',
     description: '',
     location: '',
-    gpsLink: '',
-    latitude: '',
-    longitude: '',
+    mapIframe: '',
     rules: '',
     fees: '',
     contactInfo: '',
@@ -25,9 +23,7 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
         name: lake.name || '',
         description: lake.description || '',
         location: lake.location || '',
-        gpsLink: lake.gpsLink || '',
-        latitude: lake.latitude ?? '',
-        longitude: lake.longitude ?? '',
+        mapIframe: lake.mapIframe || '',
         rules: lake.rules || '',
         fees: lake.fees || '',
         contactInfo: lake.contactInfo || '',
@@ -71,9 +67,7 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
 
       const payload = {
         ...formData,
-        gpsLink: formData.gpsLink.trim() || null,
-        latitude: formData.latitude !== '' ? Number(formData.latitude) : null,
-        longitude: formData.longitude !== '' ? Number(formData.longitude) : null,
+        mapIframe: formData.mapIframe.trim() || null,
         rules: formData.rules.trim() || null,
         fees: formData.fees.trim() || null,
         contactInfo: formData.contactInfo.trim() || null,
@@ -81,11 +75,11 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
       };
 
       if (lake) {
-        // Aktualizuj istniejŽ£…ce jezioro
+        // Aktualizuj istniejï¿½ï¿½ï¿½ce jezioro
         const result = await lakeService.updateLake(lake._id, payload);
         savedLake = result.lake;
       } else {
-        // UtwŽ£…rz nowe jezioro
+        // Utwï¿½ï¿½ï¿½rz nowe jezioro
         const result = await lakeService.createLake(payload);
         savedLake = result.lake;
       }
@@ -100,9 +94,7 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
         name: '',
         description: '',
         location: '',
-        gpsLink: '',
-        latitude: '',
-        longitude: '',
+        mapIframe: '',
         rules: '',
         fees: '',
         contactInfo: '',
@@ -170,37 +162,16 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="gpsLink">Link do mapy (opcjonalnie):</label>
-          <input
-            type="url"
-            id="gpsLink"
-            name="gpsLink"
-            value={formData.gpsLink}
+          <label htmlFor="mapIframe">Mapa dojazdowa - iframe z Google Maps (opcjonalnie):</label>
+          <textarea
+            id="mapIframe"
+            name="mapIframe"
+            value={formData.mapIframe}
             onChange={handleChange}
-            placeholder="https://www.google.com/maps?q=..."
+            rows="4"
+            placeholder='Wklej kod iframe z Google Maps, np: <iframe src="https://www.google.com/maps/embed?pb=..." ...></iframe>'
           />
-        </div>
-
-        <div className="form-group">
-          <label>Wspó³rzêdne GPS (opcjonalnie):</label>
-          <div className="gps-inputs">
-            <input
-              type="number"
-              name="latitude"
-              value={formData.latitude}
-              onChange={handleChange}
-              placeholder="Latitude"
-              step="0.000001"
-            />
-            <input
-              type="number"
-              name="longitude"
-              value={formData.longitude}
-              onChange={handleChange}
-              placeholder="Longitude"
-              step="0.000001"
-            />
-          </div>
+          <small>Aby uzyskaÄ‡ kod iframe: Google Maps â†’ UdostÄ™pnij â†’ UmieÅ›Ä‡ mapÄ™ â†’ Skopiuj kod HTML</small>
         </div>
         <div className="form-group">
           <label htmlFor="rules">Regulamin (opcjonalnie):</label>
@@ -215,14 +186,14 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="fees">Op³aty (opcjonalnie):</label>
+          <label htmlFor="fees">Opï¿½aty (opcjonalnie):</label>
           <textarea
             id="fees"
             name="fees"
             value={formData.fees}
             onChange={handleChange}
             rows="3"
-            placeholder="Np. 20 z³/dzieñ, 100 z³/tydzieñ..."
+            placeholder="Np. 20 zï¿½/dzieï¿½, 100 zï¿½/tydzieï¿½..."
           />
         </div>
 
