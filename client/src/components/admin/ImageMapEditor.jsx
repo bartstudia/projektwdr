@@ -191,24 +191,35 @@ const ImageMapEditor = ({ lakeImage, onSave, existingSpots = [], lake }) => {
           />
         )}
 
-        {/* Render polygon lines */}
+        {/* Render polygon lines and preview */}
         {shape === 'poly' && clickedPoints.length > 1 && (
           <svg className="editor-svg-overlay" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+            {/* Draw lines between points */}
             {clickedPoints.map((point, idx) => {
               if (idx === 0) return null;
               const prevPoint = clickedPoints[idx - 1];
               return (
                 <line
-                  key={idx}
+                  key={`line-${idx}`}
                   x1={prevPoint.x}
                   y1={prevPoint.y}
                   x2={point.x}
                   y2={point.y}
-                  stroke="#2196f3"
+                  stroke="#2196f3" 
                   strokeWidth="2"
                 />
               );
             })}
+
+            {/* Draw the polygon preview */}
+            {clickedPoints.length > 2 && (
+              <polygon
+                points={clickedPoints.map(p => `${p.x},${p.y}`).join(' ')}
+                fill="rgba(46, 204, 113, 0.5)" 
+                stroke="#2ecc71" 
+                strokeWidth="2"
+              />
+            )}
           </svg>
         )}
 
