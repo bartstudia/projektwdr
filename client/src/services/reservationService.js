@@ -69,18 +69,6 @@ const reservationService = {
     }
   },
 
-  // Pobierz dostępność jeziora w zakresie dat (PUBLIC)
-  getLakeAvailability: async (lakeId, startDate, endDate) => {
-    try {
-      const response = await api.get(`/reservations/lake/${lakeId}/availability`, {
-        params: { startDate, endDate }
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Błąd podczas pobierania dostępności jeziora' };
-    }
-  },
-
   // Admin: Pobierz wszystkie rezerwacje
   getAllReservations: async (params = {}) => {
     try {
