@@ -15,6 +15,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
+          <img src="/logo.png" alt="Logo" className="navbar-logo-image" />
           Rezerwacje Wędkarskie
         </Link>
 

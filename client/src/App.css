@@ -168,6 +168,15 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.navbar-logo-image {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px;
+}
+
 .navbar-logo:hover {
   transform: scale(1.05);
 }
