@@ -88,7 +88,6 @@ const RegisterForm = () => {
             type="text"
             id="name"
             name="name"
-            data-testid="register-name"
             value={formData.name}
             onChange={handleChange}
             required
@@ -102,7 +101,6 @@ const RegisterForm = () => {
             type="email"
             id="email"
             name="email"
-            data-testid="register-email"
             value={formData.email}
             onChange={handleChange}
             required
@@ -116,7 +114,6 @@ const RegisterForm = () => {
             type="password"
             id="password"
             name="password"
-            data-testid="register-password"
             value={formData.password}
             onChange={handleChange}
             required
@@ -131,7 +128,6 @@ const RegisterForm = () => {
             type="password"
             id="confirmPassword"
             name="confirmPassword"
-            data-testid="register-confirm"
             value={formData.confirmPassword}
             onChange={handleChange}
             required
@@ -140,7 +136,7 @@ const RegisterForm = () => {
           />
         </div>
 
-        <button type="submit" className="btn-primary" disabled={isLoading} data-testid="register-submit">
+        <button type="submit" className="btn-primary" disabled={isLoading}>
           {isLoading ? 'Rejestracja...' : 'Zarejestruj się'}
         </button>
       </form>

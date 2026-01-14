@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import lakeService from '../../services/lakeService';
 
 const LakeForm = ({ lake, onSuccess, onCancel }) => {
-    const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     location: '',
@@ -253,9 +253,3 @@ const LakeForm = ({ lake, onSuccess, onCancel }) => {
 };
 
 export default LakeForm;
-
-
-
-
-
-

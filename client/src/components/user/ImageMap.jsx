@@ -165,8 +165,24 @@ const ImageMap = ({ lake, spots, onSpotClick, selectedSpot, reservedSpotIds = []
                   className={`spot-marker ${isReserved ? 'reserved' : ''}`}
                 />
               );
+            } else if (spot.mapCoordinates.shape === 'poly') {
+              const points = [];
+              for (let i = 0; i < coords.length; i += 2) {
+                points.push(`${coords[i]},${coords[i + 1]}`);
+              }
+              const pointsStr = points.join(' ');
+
+              return (
+                <polygon
+                  key={spot._id}
+                  points={pointsStr}
+                  fill={fillColor}
+                  stroke={strokeColor}
+                  strokeWidth="3"
+                  className={`spot-marker ${isReserved ? 'reserved' : ''}`}
+                />
+              );
             }
-            return null;
           })}
         </svg>
       </div>
