@@ -15,7 +15,9 @@
       "Bash(dir:*)",
       "Bash(node checkLakes.js:*)",
       "Bash(node fixLakeImages.js:*)",
-      "Bash(del checkLakes.js fixLakeImages.js)"
+      "Bash(del checkLakes.js fixLakeImages.js)",
+      "Bash(curl:*)",
+      "Bash(git ls-tree:*)"
     ]
   }
 }
